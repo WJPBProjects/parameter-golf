@@ -54,7 +54,10 @@ Current seed file:
 
 - Before starting a new experiment, check `codex_notes/coordination/experiment_board.md`.
 - Always reread the relevant note or board file immediately before editing it, so you do not overwrite newer context from another agent.
-- If you claim an experiment, update its status to `IN_PROGRESS:<agent_id>`.
+- This repo uses a two-stage experiment flow:
+  - local screening first
+  - remote promotion only for ideas that clear the local bar
+- If you claim an experiment, update its local or remote status to `IN_PROGRESS:<agent_id>`.
 - If your runtime does not expose an agent ID, use a stable owner label such as:
   - `IN_PROGRESS:main-agent`
   - `IN_PROGRESS:worker-xsa`
@@ -66,16 +69,22 @@ Current seed file:
 - Include concrete details:
   - branch name
   - worktree path
-  - exact command(s)
+  - exact local-screen command(s)
+  - exact remote-run command(s)
   - important metrics
+  - log and artifact paths
   - what worked / failed
+  - promotion decision
   - next step
 - Keep notes concise and high signal.
 - Do not dump giant raw logs into notes; summarize them and point to the log path instead.
-- When you finish an experiment, update the board status to one of:
-  - `DONE`
-  - `TODO`
-  - `BLOCKED`
+- Record both:
+  - whether the experiment has passed local screening
+  - whether it should be promoted to remote training
+- When a remote run is started or finished, update the board and the experiment note immediately so future agents can see:
+  - which ideas still need remote runs
+  - which ideas already ran remotely
+  - which ideas are promising, weak, or dead ends
 - If you stop mid-experiment, leave enough detail that another agent can resume without rereading the whole repo.
 
 ## Parallel experiment workflow

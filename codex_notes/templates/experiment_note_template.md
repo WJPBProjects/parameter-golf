@@ -15,13 +15,44 @@
 ## Scope
 
 - Files expected to change:
-- Command(s) to run:
+- Local screen command(s):
+- Remote run command(s):
 
 ## Progress
 
 - 
 
-## Results
+## Local Screening
+
+- Status:
+- Date:
+- Log path:
+- Artifact path(s):
+- Throughput / wallclock:
+- Val / BPB:
+- Notes:
+
+## Promotion Decision
+
+- Promote to remote:
+- Reason:
+- Remote priority:
+
+## Remote Training
+
+- Status:
+- Date:
+- Machine / provider:
+- Run identifier:
+- Log path:
+- Artifact path(s):
+- Pre-quant:
+- Post-quant:
+- Speed / wallclock:
+- Artifact size:
+- Notes:
+
+## Results Summary
 
 - Pre-quant:
 - Post-quant:

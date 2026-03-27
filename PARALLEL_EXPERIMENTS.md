@@ -75,13 +75,19 @@ bash scripts/remove_experiment_worktree.sh xsa-all
 1. Start from the existing shared baseline branch or commit provided by the user.
 2. Create one worktree per experiment.
 3. Give each Codex worker a single worktree path and clear file ownership.
-4. Run the experiment and capture:
+4. Run the experiment locally first and capture:
    - exact code changes
-   - exact command
-   - exact logs
+   - exact local command
+   - exact local logs
+   - local metrics
+5. Mark whether the experiment should be promoted to remote training on the board.
+6. If promoted, run the remote job and capture:
+   - exact remote command
+   - remote log path / run identifier
    - pre-quant and post-quant metrics
-5. Commit each experiment independently on its own branch.
-6. Compare winners and cherry-pick or merge only the promising ones into an integration branch.
+   - artifact size
+7. Commit each experiment independently on its own branch.
+8. Compare winners and cherry-pick or merge only the promising ones into an integration branch.
 
 ## Notes and memory
 
@@ -93,8 +99,11 @@ bash scripts/remove_experiment_worktree.sh xsa-all
 - Reread the relevant coordination or scratchpad file immediately before editing it.
 - At minimum, record:
   - branch/worktree
-  - commands run
+  - local commands run
+  - remote commands run
+  - log and artifact paths
   - metrics observed
+  - whether the experiment should be promoted to remote
   - current conclusion
 
 ## What not to do

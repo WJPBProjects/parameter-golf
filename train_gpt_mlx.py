@@ -55,6 +55,9 @@ class Hyperparameters:
     val_loss_every: int = int(os.environ.get("VAL_LOSS_EVERY", 0))
     # Validation always uses the full fineweb_val split.
     val_batch_size: int = int(os.environ.get("VAL_BATCH_SIZE", 524_288))
+    # Dev helper: cap validation work locally so idea screening does not spend most
+    # of its time on the fixed full validation pass.
+    dev_val_max_batches: int = int(os.environ.get("DEV_VAL_MAX_BATCHES", 0))
     train_log_every: int = int(os.environ.get("TRAIN_LOG_EVERY", 200))
     train_batch_tokens: int = int(os.environ.get("TRAIN_BATCH_TOKENS", 524_288))
     grad_accum_steps: int = int(os.environ.get("GRAD_ACCUM_STEPS", 8))
@@ -98,6 +101,9 @@ class Hyperparameters:
     muon_momentum_warmup_start: float = float(os.environ.get("MUON_MOMENTUM_WARMUP_START", 0.85))
     muon_momentum_warmup_steps: int = int(os.environ.get("MUON_MOMENTUM_WARMUP_STEPS", 500))
     grad_clip_norm: float = float(os.environ.get("GRAD_CLIP_NORM", 0.0))
+    # Dev helper: skip the second full validation pass over the quantized roundtrip
+    # artifact when screening ideas locally. Keep this off for real comparisons.
+    skip_final_int8_eval: bool = bool(int(os.environ.get("SKIP_FINAL_INT8_EVAL", "0")))
 
     out_dir: str = os.environ.get("OUT_DIR", "logs")
 
@@ -851,10 +857,14 @@ def eval_val(
     val_batch_seqs = val_batch_tokens // args.train_seq_len
     total_seqs = (val_tokens.size - 1) // args.train_seq_len
     total_batches = max((total_seqs + val_batch_seqs - 1) // val_batch_seqs, 1)
+    if args.dev_val_max_batches > 0:
+        total_batches = min(total_batches, args.dev_val_max_batches)
     total_loss_sum = 0.0
     total_tokens = 0.0
     total_bytes = 0.0
     for batch_idx, batch_seq_start in enumerate(range(0, total_seqs, val_batch_seqs), start=1):
+        if batch_idx > total_batches:
+            break
         batch_seq_end = min(batch_seq_start + val_batch_seqs, total_seqs)
         raw_start = batch_seq_start * args.train_seq_len
         raw_end = batch_seq_end * args.train_seq_len + 1
@@ -1024,6 +1034,11 @@ def main() -> None:
         f"warmup_steps:{args.warmup_steps} max_wallclock_seconds:{args.max_wallclock_seconds:.3f}"
     )
     log(f"mlx_max_microbatch_tokens:{args.mlx_max_microbatch_tokens}")
+    if args.dev_val_max_batches > 0 or args.skip_final_int8_eval:
+        log(
+            f"dev_mode dev_val_max_batches:{args.dev_val_max_batches} "
+            f"skip_final_int8_eval:{args.skip_final_int8_eval}"
+        )
     log(
         f"optimizer:muon+adam muon_matrix_params:{len(opt.matrix_keys)} scalar_params:{len(opt.scalar_keys)} "
         f"embed_lr:{args.tied_embed_lr} "
@@ -1186,6 +1201,9 @@ def main() -> None:
         quant_blob_disk = f.read()
     quant_flat = dequantize_state_dict_int8(pickle.loads(zlib.decompress(quant_blob_disk)))
     model.update(tree_unflatten(list(quant_flat.items())))
+    if args.skip_final_int8_eval:
+        log("final_int8_zlib_roundtrip skipped:true")
+        return
     q_t0 = time.perf_counter()
     q_val_loss, q_val_bpb = eval_val(
         args,
