@@ -1,33 +1,33 @@
-# Experiment Note Template
+# Experiment Note
 
 ## Experiment
 
-- Name:
-- Status:
+- Name: RoPE + LN-scale grid
+- Status: TODO
 - Owner:
-- Branch:
+- Branch: `codex/rope-lnscale-grid`
 - Worktree:
-- Seed(s):
 
 ## Hypothesis
 
-- 
+- Partial RoPE choices and learned scale schedules may offer a cheap architecture win if tuned together rather than independently.
 
 ## Scope
 
 - Files expected to change:
+  - `train_gpt.py`
+  - `train_gpt_mlx.py`
 - Local screen command(s):
 - Remote run command(s):
 
 ## Progress
 
-- 
+- Baseline for comparison: `codex_notes/coordination/baseline_benchmarks.md`
 
 ## Local Screening
 
 - Status:
 - Date:
-- Seed(s):
 - Log path:
 - Artifact path(s):
 - Throughput / wallclock:
@@ -44,7 +44,6 @@
 
 - Status:
 - Date:
-- Seed(s):
 - Machine / provider:
 - Run identifier:
 - Log path:

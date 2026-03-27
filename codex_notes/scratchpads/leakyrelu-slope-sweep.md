@@ -1,33 +1,33 @@
-# Experiment Note Template
+# Experiment Note
 
 ## Experiment
 
-- Name:
-- Status:
+- Name: LeakyReLU slope sweep
+- Status: TODO
 - Owner:
-- Branch:
+- Branch: `codex/leakyrelu-slope-sweep`
 - Worktree:
-- Seed(s):
 
 ## Hypothesis
 
-- 
+- The current nonlinearity is promising enough that slope sweeps may buy cheap quality gains with little implementation risk.
 
 ## Scope
 
 - Files expected to change:
+  - `train_gpt.py`
+  - `train_gpt_mlx.py`
 - Local screen command(s):
 - Remote run command(s):
 
 ## Progress
 
-- 
+- Baseline for comparison: `codex_notes/coordination/baseline_benchmarks.md`
 
 ## Local Screening
 
 - Status:
 - Date:
-- Seed(s):
 - Log path:
 - Artifact path(s):
 - Throughput / wallclock:
@@ -44,7 +44,6 @@
 
 - Status:
 - Date:
-- Seed(s):
 - Machine / provider:
 - Run identifier:
 - Log path:

@@ -1,33 +1,32 @@
-# Experiment Note Template
+# Experiment Note
 
 ## Experiment
 
-- Name:
-- Status:
+- Name: GPTQ self calibration
+- Status: TODO
 - Owner:
-- Branch:
+- Branch: `codex/gptq-self-calibration`
 - Worktree:
-- Seed(s):
 
 ## Hypothesis
 
-- 
+- Self-generated or synthetic calibration data may retain most GPTQ benefit while making the calibration path cheaper or cleaner.
 
 ## Scope
 
 - Files expected to change:
+  - `train_gpt.py`
 - Local screen command(s):
 - Remote run command(s):
 
 ## Progress
 
-- 
+- Baseline for comparison: `codex_notes/coordination/baseline_benchmarks.md`
 
 ## Local Screening
 
 - Status:
 - Date:
-- Seed(s):
 - Log path:
 - Artifact path(s):
 - Throughput / wallclock:
@@ -44,7 +43,6 @@
 
 - Status:
 - Date:
-- Seed(s):
 - Machine / provider:
 - Run identifier:
 - Log path:

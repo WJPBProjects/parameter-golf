@@ -35,6 +35,8 @@ Current known files include:
 - Prefer small, focused Markdown files over one huge running log.
 - The main coordination files are:
   - `codex_notes/coordination/experiment_board.md`
+  - `codex_notes/coordination/baseline_benchmarks.md`
+  - `codex_notes/coordination/promotion_rubric.md`
   - `codex_notes/templates/experiment_note_template.md`
 - Good note topics:
   - experiment plans
@@ -48,6 +50,8 @@ Current seed file:
 
 - `codex_notes/README.md`
 - `codex_notes/coordination/experiment_board.md`
+- `codex_notes/coordination/baseline_benchmarks.md`
+- `codex_notes/coordination/promotion_rubric.md`
 - `codex_notes/templates/experiment_note_template.md`
 
 ## Note-taking expectations for agents

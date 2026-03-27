@@ -16,7 +16,9 @@ Structure:
 Agents should start with:
 
 1. `coordination/experiment_board.md`
-2. `templates/experiment_note_template.md`
+2. `coordination/baseline_benchmarks.md`
+3. `coordination/promotion_rubric.md`
+4. `templates/experiment_note_template.md`
 
 The intended flow is:
 

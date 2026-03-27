@@ -2,6 +2,11 @@
 
 Use this file to coordinate active and planned experiments across agents.
 
+Also read:
+
+- `codex_notes/coordination/baseline_benchmarks.md`
+- `codex_notes/coordination/promotion_rubric.md`
+
 ## Status conventions
 
 - `TODO`
@@ -27,6 +32,7 @@ When finishing:
 2. Update the promotion decision.
 3. Update the remote-run status if applicable.
 4. Update the summary with the best current conclusion.
+5. If the promotion decision changed, explain why in the experiment note.
 
 ## Column meaning
 

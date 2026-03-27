@@ -1,33 +1,32 @@
-# Experiment Note Template
+# Experiment Note
 
 ## Experiment
 
-- Name:
-- Status:
+- Name: Compile-safe Late-QAT
+- Status: TODO
 - Owner:
-- Branch:
+- Branch: `codex/compile-safe-late-qat`
 - Worktree:
-- Seed(s):
 
 ## Hypothesis
 
-- 
+- A late-stage QAT path that survives compile optimizations may reduce the post-quantization quality gap enough to matter.
 
 ## Scope
 
 - Files expected to change:
+  - `train_gpt.py`
 - Local screen command(s):
 - Remote run command(s):
 
 ## Progress
 
-- 
+- Baseline for comparison: `codex_notes/coordination/baseline_benchmarks.md`
 
 ## Local Screening
 
 - Status:
 - Date:
-- Seed(s):
 - Log path:
 - Artifact path(s):
 - Throughput / wallclock:
@@ -44,7 +43,6 @@
 
 - Status:
 - Date:
-- Seed(s):
 - Machine / provider:
 - Run identifier:
 - Log path:

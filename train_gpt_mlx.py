@@ -1033,6 +1033,7 @@ def main() -> None:
         f"val_batch_size:{args.val_batch_size} "
         f"warmup_steps:{args.warmup_steps} max_wallclock_seconds:{args.max_wallclock_seconds:.3f}"
     )
+    log(f"seed:{args.seed}")
     log(f"mlx_max_microbatch_tokens:{args.mlx_max_microbatch_tokens}")
     if args.dev_val_max_batches > 0 or args.skip_final_int8_eval:
         log(

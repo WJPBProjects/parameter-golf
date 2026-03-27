@@ -1,33 +1,32 @@
-# Experiment Note Template
+# Experiment Note
 
 ## Experiment
 
-- Name:
-- Status:
+- Name: Selective post-GPTQ pruning
+- Status: TODO
 - Owner:
-- Branch:
+- Branch: `codex/selective-post-gptq-pruning`
 - Worktree:
-- Seed(s):
 
 ## Hypothesis
 
-- 
+- Pruning the lowest-value quantized weights after GPTQ may improve artifact size efficiency without destroying quality.
 
 ## Scope
 
 - Files expected to change:
+  - `train_gpt.py`
 - Local screen command(s):
 - Remote run command(s):
 
 ## Progress
 
-- 
+- Baseline for comparison: `codex_notes/coordination/baseline_benchmarks.md`
 
 ## Local Screening
 
 - Status:
 - Date:
-- Seed(s):
 - Log path:
 - Artifact path(s):
 - Throughput / wallclock:
@@ -44,7 +43,6 @@
 
 - Status:
 - Date:
-- Seed(s):
 - Machine / provider:
 - Run identifier:
 - Log path:
