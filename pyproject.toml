@@ -1,0 +1,26 @@
+[project]
+name = "parameter-golf"
+version = "0.1.0"
+description = "OpenAI Parameter Golf challenge baselines and utilities"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "datasets",
+  "huggingface-hub",
+  "kernels",
+  "numpy",
+  "sentencepiece",
+  "setuptools",
+  "tiktoken",
+  "torch",
+  "tqdm",
+  "typing-extensions==4.15.0",
+]
+
+[project.optional-dependencies]
+mlx = [
+  "mlx",
+]
+
+[tool.uv]
+package = false
