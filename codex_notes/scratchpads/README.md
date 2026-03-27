@@ -11,9 +11,9 @@ Good examples:
 
 Before editing a scratchpad:
 
-1. reread `codex_notes/coordination/experiment_board.md`
+1. reread `codex_notes/coordination_live/experiment_board.md` when present
 2. reread the scratchpad itself
-3. if deciding on remote promotion, reread `codex_notes/coordination/promotion_rubric.md`
+3. if deciding on remote promotion, reread `codex_notes/coordination_live/promotion_rubric.md`
 
 Keep these concise and useful for handoff:
 

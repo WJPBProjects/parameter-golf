@@ -22,8 +22,10 @@ gets its own git worktree and branch.
 - This repo also has:
   - `wulfie_notes/` for user-authored, read-only notes
   - `codex_notes/` for agent scratch notes and memory
+- Shared coordination should go through `codex_notes/coordination_live/` so status lands back in the main worktree even when experiment code stays isolated.
 - Agents should read `AGENTS.md` before writing notes or starting parallel work.
 - In the normal flow, agents should assume a shared baseline already exists and branch off from it.
+- New worktrees also get experiment-local trainer copies under `experiments/<experiment-name>/`.
 
 ## Interference review
 
@@ -35,13 +37,20 @@ With separate worktrees, code edits and default training outputs are isolated we
 
 That means separate worktrees do not clobber each other's model artifacts by default.
 
+To reduce merge pressure further, experiment worktrees should usually edit:
+
+- `experiments/<experiment-name>/train_gpt.py`
+- `experiments/<experiment-name>/train_gpt_mlx.py`
+
+instead of the repo-root trainer files.
+
 The remaining shared-resource issue is setup, not code interference:
 
 - fresh worktrees need access to the shared Python environment
 - fresh worktrees need access to the downloaded dataset/tokenizers
-- fresh worktrees should see the shared `codex_notes/` board
+- fresh worktrees should see the shared coordination notes in the main worktree
 
-The helper script handles this by linking shared local resources into each new worktree.
+The helper script handles this by linking shared local resources into each new worktree and by creating `codex_notes/coordination_live` as a pointer back to the main worktree's coordination files.
 
 ## Important prerequisite
 
@@ -80,6 +89,7 @@ bash scripts/remove_experiment_worktree.sh xsa-all
    - exact local command
    - exact local logs
    - local metrics
+   - whether the experiment used experiment-local trainer copies
 5. Mark whether the experiment should be promoted to remote training on the board.
 6. If promoted, run the remote job and capture:
    - exact remote command
@@ -93,12 +103,14 @@ bash scripts/remove_experiment_worktree.sh xsa-all
 
 - Read user context from `wulfie_notes/`, but do not edit it unless explicitly asked.
 - Leave agent notes in `codex_notes/`.
+- Use `codex_notes/coordination_live/` for shared board/baseline/promotion updates.
 - When an experiment starts, it is a good idea to create a note file such as:
   - `codex_notes/scratchpads/xsa-all.md`
   - `codex_notes/scratchpads/gptq-self-calibration.md`
 - Reread the relevant coordination or scratchpad file immediately before editing it.
 - At minimum, record:
   - branch/worktree
+  - experiment-local trainer path(s)
   - local commands run
   - remote commands run
   - log and artifact paths

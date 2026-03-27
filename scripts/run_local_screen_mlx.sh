@@ -16,4 +16,6 @@ export SKIP_FINAL_INT8_EVAL="${SKIP_FINAL_INT8_EVAL:-1}"
 export MLX_EAGER_EVAL="${MLX_EAGER_EVAL:-0}"
 export MLX_MAX_MICROBATCH_TOKENS="${MLX_MAX_MICROBATCH_TOKENS:-16384}"
 
-exec ./.venv/bin/python train_gpt_mlx.py "$@"
+SCRIPT_PATH="${TRAIN_MLX_SCRIPT:-train_gpt_mlx.py}"
+
+exec ./.venv/bin/python "$SCRIPT_PATH" "$@"

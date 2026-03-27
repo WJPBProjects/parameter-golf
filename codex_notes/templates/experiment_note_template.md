@@ -8,6 +8,7 @@
 - Branch:
 - Worktree:
 - Seed(s):
+- Experiment-local trainer path(s):
 
 ## Hypothesis
 

@@ -33,10 +33,16 @@ Current known files include:
   - `codex_notes/templates/` for templates
   - `codex_notes/scratchpads/` for rough or experiment-specific notes
 - Prefer small, focused Markdown files over one huge running log.
+- Coordination has two modes:
+  - `codex_notes/coordination/` is the repo copy
+  - `codex_notes/coordination_live/` is the canonical shared coordination path when present
+- In the main worktree, `coordination_live/` points at the local coordination directory.
+- In experiment worktrees, `coordination_live/` points back to the main worktree's coordination directory.
+- That means shared board/status updates should go through `coordination_live/`, while experiment scratchpads remain branch-local under `codex_notes/scratchpads/`.
 - The main coordination files are:
-  - `codex_notes/coordination/experiment_board.md`
-  - `codex_notes/coordination/baseline_benchmarks.md`
-  - `codex_notes/coordination/promotion_rubric.md`
+  - `codex_notes/coordination_live/experiment_board.md`
+  - `codex_notes/coordination_live/baseline_benchmarks.md`
+  - `codex_notes/coordination_live/promotion_rubric.md`
   - `codex_notes/templates/experiment_note_template.md`
 - Good note topics:
   - experiment plans
@@ -49,18 +55,22 @@ Current known files include:
 Current seed file:
 
 - `codex_notes/README.md`
-- `codex_notes/coordination/experiment_board.md`
-- `codex_notes/coordination/baseline_benchmarks.md`
-- `codex_notes/coordination/promotion_rubric.md`
+- `codex_notes/coordination_live/experiment_board.md`
+- `codex_notes/coordination_live/baseline_benchmarks.md`
+- `codex_notes/coordination_live/promotion_rubric.md`
 - `codex_notes/templates/experiment_note_template.md`
 
 ## Note-taking expectations for agents
 
-- Before starting a new experiment, check `codex_notes/coordination/experiment_board.md`.
+- Before starting a new experiment, check `codex_notes/coordination_live/experiment_board.md` when that path exists. If it does not, use `codex_notes/coordination/experiment_board.md`.
 - Always reread the relevant note or board file immediately before editing it, so you do not overwrite newer context from another agent.
 - This repo uses a two-stage experiment flow:
   - local screening first
   - remote promotion only for ideas that clear the local bar
+- In experiment worktrees, prefer editing experiment-local trainer copies under:
+  - `experiments/<experiment-name>/train_gpt.py`
+  - `experiments/<experiment-name>/train_gpt_mlx.py`
+- Leave the repo-root trainers alone unless you are intentionally promoting an experiment back toward integration.
 - If you claim an experiment, update its local or remote status to `IN_PROGRESS:<agent_id>`.
 - If your runtime does not expose an agent ID, use a stable owner label such as:
   - `IN_PROGRESS:main-agent`
@@ -73,6 +83,7 @@ Current seed file:
 - Include concrete details:
   - branch name
   - worktree path
+  - experiment-local trainer path(s)
   - exact local-screen command(s)
   - exact remote-run command(s)
   - important metrics
@@ -85,6 +96,7 @@ Current seed file:
 - Record both:
   - whether the experiment has passed local screening
   - whether it should be promoted to remote training
+- Shared coordination updates belong in `codex_notes/coordination_live/` so the main worktree reflects what is happening even while code stays isolated on experiment branches.
 - When a remote run is started or finished, update the board and the experiment note immediately so future agents can see:
   - which ideas still need remote runs
   - which ideas already ran remotely
@@ -107,4 +119,5 @@ See `PARALLEL_EXPERIMENTS.md` for the worktree workflow.
 - Do not mix multiple unrelated experiments in one branch.
 - Do not use `main` as an experiment scratch branch.
 - Do not put experiment-priority decisions or first-wave plans into `PARALLEL_EXPERIMENTS.md`; keep those in `codex_notes/`.
+- Do not merge every experiment's code back into `main` just to report status; update shared coordination notes in `coordination_live/` instead.
 - When in doubt, write a note in `codex_notes/` before or after significant work so future agents can pick up context quickly.

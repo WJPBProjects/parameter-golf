@@ -2,6 +2,12 @@
 
 This directory is shared agent memory and scratch space.
 
+Important:
+
+- `codex_notes/coordination_live/` is the canonical shared coordination path when present.
+- In experiment worktrees, `coordination_live/` points back to the main worktree so board/status updates stay shared.
+- `codex_notes/scratchpads/` remains branch-local by design.
+
 Structure:
 
 - `coordination/`
@@ -15,9 +21,9 @@ Structure:
 
 Agents should start with:
 
-1. `coordination/experiment_board.md`
-2. `coordination/baseline_benchmarks.md`
-3. `coordination/promotion_rubric.md`
+1. `coordination_live/experiment_board.md`
+2. `coordination_live/baseline_benchmarks.md`
+3. `coordination_live/promotion_rubric.md`
 4. `templates/experiment_note_template.md`
 
 The intended flow is:
