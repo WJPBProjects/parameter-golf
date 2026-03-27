@@ -1,0 +1,21 @@
+# codex_notes
+
+This directory is shared agent memory and scratch space.
+
+Structure:
+
+- `coordination/`
+  - shared experiment board and other high-priority coordination files
+- `planning/`
+  - mutable planning notes such as likely first-wave experiment ideas
+- `templates/`
+  - note templates for experiments and handoff docs
+- `scratchpads/`
+  - ad hoc notes, rough thinking, temporary agent notes
+
+Agents should start with:
+
+1. `coordination/experiment_board.md`
+2. `templates/experiment_note_template.md`
+
+Then create or update a specific experiment note or scratchpad as needed.
