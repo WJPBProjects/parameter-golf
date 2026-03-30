@@ -2,7 +2,11 @@
 
 Use this file as the simplest sequential run order for the current local Mac screening wave.
 
-Baseline to beat:
+The stronger rerun wave is now complete. For current results, use:
+
+- `codex_notes/coordination/local_rerun_wave_20260327.md`
+
+Older baseline references:
 
 - `codex_notes/coordination/baseline_benchmarks.md`
 - Current local MLX baseline post-quant `val_bpb`: `3.85822586`

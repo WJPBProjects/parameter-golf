@@ -68,7 +68,43 @@ This gap is expected because the hardware and training path are very different.
 ## What to compare against next
 
 - For local screening:
-  - compare new local MLX runs against `val_bpb:3.85822586`
+  - compare new full local MLX runs against `val_bpb:3.85822586`
   - keep machine, shard subset, and command shape as stable as possible
 - For remote promotion:
   - compare promoted runs against the remote README / leaderboard expectations instead
+
+## Current longer local-screen baseline
+
+### `baseline_long_seed1337`
+
+- Date: `2026-03-27`
+- Command:
+  - `SEED=1337 RUN_ID=baseline_long_seed1337 bash scripts/run_local_screen_mlx.sh`
+- Seed:
+  - `1337`
+- Log:
+  - `logs/baseline_long_seed1337.txt`
+- Artifacts:
+  - `logs/baseline_long_seed1337_mlx_model.npz`
+  - `logs/baseline_long_seed1337_mlx_model.int8.ptz`
+
+## Longer local-screen metrics
+
+- Train:
+  - `step:800/800`
+  - `train_time:225971ms`
+  - `step_avg:282.46ms`
+- Pre-quant capped validation:
+  - `val_loss:3.5904`
+  - `val_bpb:2.1573`
+- Quantized roundtrip:
+  - `val_loss:3.59037498`
+  - `val_bpb:2.15725007`
+  - `eval_time:21434ms`
+- Artifact size:
+  - `serialized_model_int8_zlib:13736236 bytes`
+
+## Longer local-screen interpretation
+
+- This is now the fair comparison point for the strengthened `run_local_screen_mlx.sh` harness.
+- Use it for apples-to-apples comparisons against local experiment branches that are rerun on the same longer screen settings.
