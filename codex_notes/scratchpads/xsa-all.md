@@ -3,10 +3,10 @@
 ## Experiment
 
 - Name: XSA all layers
-- Status: TODO
-- Owner:
+- Status: PASS
+- Owner: `main-agent`
 - Branch: `codex/xsa-all`
-- Worktree:
+- Worktree: `/Users/wulfie/code/parameter-golf-worktrees/xsa-all`
 
 ## Hypothesis
 
@@ -45,15 +45,20 @@
   - baseline comparison: `3.85822586` post-quant local benchmark
   - training is slower than baseline, but the scored post-quant BPB improved substantially
   - quantized artifact size increased to `7839700 bytes`, still under the 16MB cap
+  - rerun on the stronger default local-screen harness:
+    - command: `SEED=1337 RUN_ID=xsa_all_long_seed1337_v2 XSA_LAST_N=9 TRAIN_MLX_SCRIPT=experiments/xsa-all/train_gpt_mlx.py bash scripts/run_local_screen_mlx.sh`
+    - baseline on the same stronger harness: `2.15725007`
+    - `xsa-all` on the stronger harness: `2.15552024`
+    - artifact size: `13,743,183 bytes`
+    - conclusion: still positive, but only by about `0.00173 val_bpb`, so the effect is much smaller than the earlier short-screen result suggested
 
 ## Promotion Decision
 
-- Promote to remote: `READY`
+- Promote to remote: `HOLD`
 - Reason:
-  - local post-quant BPB improved by about `0.1558` over the saved baseline
-  - artifact stays under the 16MB limit
-  - the change is isolated and reproducible on the local screen
-- Remote priority: `HIGH`
+  - the stronger longer-harness rerun still beats baseline, but only narrowly
+  - that leaves too little margin to promote confidently from local signal alone
+- Remote priority: `medium`
 
 ## Remote Training
 
@@ -76,11 +81,17 @@
 - Post-quant: `6.25137234 val_loss`, `3.70241482 val_bpb`
 - Speed / wallclock: `295.78ms` per step on the local screen
 - Artifact size: `7839700 bytes`
+- Stronger local-screen rerun:
+  - Pre-quant: `3.5855 val_loss`, `2.1543 val_bpb`
+  - Post-quant: `3.58749597 val_loss`, `2.15552024 val_bpb`
+  - Speed / wallclock: `281.78ms` per step
+  - Artifact size: `13743183 bytes`
 
 ## Conclusion
 
 - XSA-all is a real improvement signal on the local MLX screen, but it costs some throughput and increases the compressed artifact size.
-- Promote this to remote training.
+- On the stronger default local-screen harness, the gain is still real but much smaller.
+- Keep it as a candidate, but not as confidently as the earlier shorter screen implied.
 
 ## Next step
 
