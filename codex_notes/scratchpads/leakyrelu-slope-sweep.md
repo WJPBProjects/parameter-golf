@@ -41,7 +41,14 @@
 - Artifact path(s):
 - Throughput / wallclock:
 - Val / BPB:
-- Notes: both smoke runs completed; `0.0` preserved the baseline path and `0.05` ran cleanly with the same shape.
+- Notes:
+  - both smoke runs completed; `0.0` preserved the baseline path and `0.05` ran cleanly with the same shape.
+  - stronger local-screen rerun for the candidate nonzero slope:
+    - command: `SEED=1337 RUN_ID=leakyrelu_long_seed1337 LEAKY_RELU_NEGATIVE_SLOPE=0.05 TRAIN_MLX_SCRIPT=experiments/leakyrelu-slope-sweep/train_gpt_mlx.py bash scripts/run_local_screen_mlx.sh`
+    - baseline on the same stronger harness: `2.15725007`
+    - leaky slope `0.05`: `2.15780121`
+    - artifact size: `13726672 bytes`
+    - conclusion: effectively flat, slightly worse on BPB, so not worth promoting right now
 
 ## Promotion Decision
 
@@ -73,7 +80,8 @@
 ## Conclusion
 
 - The slope sweep knob is implemented and verified.
-- Keep it on hold until a longer local/full run or remote confirmation shows a real BPB difference.
+- The stronger longer-harness rerun did not show a useful gain for slope `0.05`.
+- Keep this as a low-priority sweep knob, not a current promotion candidate.
 
 ## Next step
 
