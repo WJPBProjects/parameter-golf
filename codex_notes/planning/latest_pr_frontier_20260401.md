@@ -4,6 +4,43 @@ This note captures the public GitHub frontier that matters for local-only iterat
 
 ## Current strong public references
 
+### `PR #1229`
+
+- Title:
+  - `Record: Scored-Position SLOT + Per-Sample Delta + GPTQ (val_bpb: 0.9300)`
+- Key ideas:
+  - scored-position SLOT
+  - per-sample delta-style adaptation
+  - GPTQ stack
+- Local portability:
+  - weak for exact score due heavy eval-time machinery
+  - moderate as a signal that `SLOT`-style scored-position ideas are now part of the frontier
+
+### `PR #1218`
+
+- Title:
+  - `Record: 4096-Vocab + 4.0-MLP-mult + 0.085-WD + Simplifications — val_bpb 1.09785 (3-seed mean)`
+- Key ideas:
+  - much larger vocab
+  - wider MLP
+  - stronger weight decay
+  - simplification of other moving parts
+- Local portability:
+  - moderate for `MLP_MULT` and `WEIGHT_DECAY`
+  - weak for full 4096-vocab adjudication unless we rebuild local data/tokenizer
+
+### `PR #1209`
+
+- Title:
+  - `Record: Full GPTQ + Score-First TTT + SLOT — val_bpb 1.1064 (3-seed mean)`
+- Key ideas:
+  - SLOT
+  - score-first TTT
+  - full GPTQ
+- Local portability:
+  - weak for exact quality ranking
+  - useful as a reminder that `SLOT` remains live in the public frontier
+
 ### `PR #1105`
 
 - Title:
@@ -87,12 +124,14 @@ The local MLX harness should be expected to catch:
 1. clear architecture wins
 2. stable residual-path improvements
 3. some hyperparameter wins
+4. at least part of the `QK_GAIN` / residual / recurrence family now visible in April 1 PRs
 
 It should *not* be expected to reliably rank:
 
 1. systems throughput wins
 2. pure export / quantization wins
 3. eval-time cache machinery
+4. full `SLOT` / scored-position / per-sample-delta leaderboard stacks
 
 ## Current local positive controls
 
@@ -102,3 +141,5 @@ It should *not* be expected to reliably rank:
    - in progress
 3. `PR1217` `QK_GAIN=5.0`
    - queued
+4. `PR1218` style wider-MLP / stronger-WD simplification
+   - likely next simple mutation if the current latest-PR wave gives signal
