@@ -54,6 +54,22 @@ The runner writes a simple wave-level progress log to:
 
 - `logs/<RUN_TAG>_wave.txt`
 
+## Latest-PR signal check
+
+After the historical rerun wave, use this to validate that the current public frontier still moves in the right direction locally:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh latest-pr-signal confirm
+```
+
+That wave currently runs:
+
+1. baseline
+2. `PR824` mimic positive control
+3. `QK_GAIN=5.0` (`PR1217`-inspired)
+4. parallel residuals partial port (`PR1204`-inspired)
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:

@@ -165,3 +165,42 @@ This gap is expected because the hardware and training path are very different.
 - The most defensible speed number is the training `step_avg`, which improved by about `4.5%`.
 - Final quantized evaluation was faster too, by about `16%`.
 - Quality is effectively unchanged, which is what we want for an apples-to-apples hardware comparison.
+
+## New laptop confirm-tier baseline
+
+### `rerun_wave_20260401_baseline`
+
+- Date: `2026-04-01`
+- Command:
+  - `CONTINUE_ON_ERROR=1 RUN_TAG=rerun_wave_20260401 bash scripts/run_local_wave.sh rerun-all confirm`
+- Profile:
+  - `confirm`
+- Seed:
+  - `1337`
+- Log:
+  - `logs/rerun_wave_20260401_baseline.txt`
+- Artifacts:
+  - `logs/rerun_wave_20260401_baseline_mlx_model.npz`
+  - `logs/rerun_wave_20260401_baseline_mlx_model.int8.ptz`
+
+## New laptop confirm-tier metrics
+
+- Train:
+  - `step:4000/4000`
+  - `train_time:1095243ms`
+  - `step_avg:273.81ms`
+- Pre-quant capped validation:
+  - `val_loss:2.8425`
+  - `val_bpb:1.6915`
+- Quantized roundtrip:
+  - `val_loss:2.84470009`
+  - `val_bpb:1.69279590`
+  - `eval_time:77809ms`
+- Artifact size:
+  - `serialized_model_int8_zlib:15143459 bytes`
+
+## Confirm-tier interpretation
+
+- This is now the stronger local-only reference point for `run_local_confirm_mlx.sh` comparisons on the new laptop.
+- It is much more informative than the shorter screen baseline for small local deltas.
+- It also confirms that the current 10-shard local subset can still produce a strong-looking learning curve under a much longer run, though very long overnight comparisons should still consider expanding to more shards.

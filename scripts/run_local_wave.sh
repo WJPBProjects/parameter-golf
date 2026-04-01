@@ -114,6 +114,13 @@ run_pr824_mimic() {
     bash "$wrapper"
 }
 
+run_qkgain5_pr1217() {
+  run_case "qkgain5_pr1217" "$WORKTREES_ROOT/qkgain5-pr1217" \
+    TRAIN_MLX_SCRIPT=experiments/qkgain5-pr1217/train_gpt_mlx.py \
+    QK_GAIN_INIT=5.0 \
+    bash "$wrapper"
+}
+
 run_gptq_calib_validation() {
   run_case "gptq_calib_validation" "$WORKTREES_ROOT/gptq-self-calibration" \
     TRAIN_MLX_SCRIPT=experiments/gptq-self-calibration/train_gpt_mlx.py \
@@ -167,9 +174,28 @@ run_splineconv() {
     bash "$wrapper"
 }
 
+run_parallel_residuals_pr1204() {
+  run_case "parallel_residuals_pr1204" "$WORKTREES_ROOT/parallel-residuals-pr1204" \
+    TRAIN_MLX_SCRIPT=experiments/parallel-residuals-pr1204/train_gpt_mlx.py \
+    PARALLEL_RESIDUAL=1 \
+    PARALLEL_START_LAYER=6 \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
+    run_xsa_all
+    run_leakyrelu
+    run_pr824_mimic
+    run_gptq_calib_validation
+    run_gptq_calib_self_generated
+    run_gptq_calib_random_tokens
+    run_selective_prune
+    run_rope_lnscale
+    run_splineconv
+    ;;
+  rerun-tail)
     run_xsa_all
     run_leakyrelu
     run_pr824_mimic
@@ -185,9 +211,15 @@ case "$wave" in
     run_pr824_mimic
     run_xsa_all
     ;;
+  latest-pr-signal)
+    run_baseline
+    run_pr824_mimic
+    run_qkgain5_pr1217
+    run_parallel_residuals_pr1204
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|winner-focus] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

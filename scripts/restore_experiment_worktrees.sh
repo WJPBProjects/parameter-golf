@@ -62,6 +62,7 @@ for name_raw in "${experiments[@]}"; do
 
   mkdir -p "$worktree_path/data"
   mkdir -p "$worktree_path/codex_notes"
+  mkdir -p "$worktree_path/scripts"
 
   link_if_missing "$repo_root/.venv" "$worktree_path/.venv"
   link_if_missing "$repo_root/.uv-cache" "$worktree_path/.uv-cache"
@@ -69,6 +70,9 @@ for name_raw in "${experiments[@]}"; do
   link_if_missing "$repo_root/data/tokenizers" "$worktree_path/data/tokenizers"
 
   ln -sfn "$repo_root/codex_notes/coordination" "$worktree_path/codex_notes/coordination_live"
+  ln -sfn "$repo_root/scripts/run_local_screen_mlx.sh" "$worktree_path/scripts/run_local_screen_mlx.sh"
+  ln -sfn "$repo_root/scripts/run_local_confirm_mlx.sh" "$worktree_path/scripts/run_local_confirm_mlx.sh"
+  ln -sfn "$repo_root/scripts/run_local_overnight_mlx.sh" "$worktree_path/scripts/run_local_overnight_mlx.sh"
 
   exclude_file="$(git -C "$worktree_path" rev-parse --git-path info/exclude)"
   mkdir -p "$(dirname "$exclude_file")"
