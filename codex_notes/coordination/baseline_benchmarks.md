@@ -108,3 +108,60 @@ This gap is expected because the hardware and training path are very different.
 
 - This is now the fair comparison point for the strengthened `run_local_screen_mlx.sh` harness.
 - Use it for apples-to-apples comparisons against local experiment branches that are rerun on the same longer screen settings.
+
+## New laptop longer local-screen baseline
+
+### `baseline_long_new_laptop`
+
+- Date: `2026-04-01`
+- Command:
+  - `SEED=1337 RUN_ID=baseline_long_new_laptop bash scripts/run_local_screen_mlx.sh`
+- Seed:
+  - `1337`
+- Log:
+  - `logs/baseline_long_new_laptop.txt`
+- Artifacts:
+  - `logs/baseline_long_new_laptop_mlx_model.npz`
+  - `logs/baseline_long_new_laptop_mlx_model.int8.ptz`
+
+## New laptop longer local-screen metrics
+
+- Train:
+  - `step:800/800`
+  - `train_time:215827ms`
+  - `step_avg:269.78ms`
+- Pre-quant capped validation:
+  - `val_loss:3.5873`
+  - `val_bpb:2.1554`
+- Quantized roundtrip:
+  - `val_loss:3.58832782`
+  - `val_bpb:2.15602005`
+  - `eval_time:17947ms`
+- Artifact size:
+  - `serialized_model_int8_zlib:13720762 bytes`
+
+## New laptop comparison vs previous longer local-screen baseline
+
+- Speed:
+  - old machine `step_avg:282.46ms`
+  - new machine `step_avg:269.78ms`
+  - delta: `-12.68ms` per step, about `4.5%` faster
+- Quantized quality:
+  - old machine `val_bpb:2.15725007`
+  - new machine `val_bpb:2.15602005`
+  - delta: `-0.00123002`
+- Quantized eval time:
+  - old machine `21434ms`
+  - new machine `17947ms`
+  - delta: `-3487ms`, about `16.3%` faster
+- Artifact size:
+  - old machine `13736236 bytes`
+  - new machine `13720762 bytes`
+  - delta: `-15474 bytes`
+
+## New laptop interpretation
+
+- The new laptop is a modest but real upgrade for the local MLX loop.
+- The most defensible speed number is the training `step_avg`, which improved by about `4.5%`.
+- Final quantized evaluation was faster too, by about `16%`.
+- Quality is effectively unchanged, which is what we want for an apples-to-apples hardware comparison.

@@ -67,6 +67,17 @@ Current seed file:
 - This repo uses a two-stage experiment flow:
   - local screening first
   - remote promotion only for ideas that clear the local bar
+- On a fresh machine, restore the saved experiment branches/worktrees before trying to rerun old experiments:
+  - `bash scripts/restore_experiment_worktrees.sh`
+- For longer local-only work, there are three standard MLX tiers:
+  - `scripts/run_local_screen_mlx.sh`
+  - `scripts/run_local_confirm_mlx.sh`
+  - `scripts/run_local_overnight_mlx.sh`
+- For a whole sequential local wave, prefer:
+  - `bash scripts/run_local_wave.sh rerun-all confirm`
+  - `bash scripts/run_local_wave.sh winner-focus overnight`
+- If longer local runs start to recycle the 10-shard subset too aggressively, expand the local dataset first:
+  - `TRAIN_SHARDS=50 bash scripts/prepare_local_extended_data.sh`
 - In experiment worktrees, prefer editing experiment-local trainer copies under:
   - `experiments/<experiment-name>/train_gpt.py`
   - `experiments/<experiment-name>/train_gpt_mlx.py`
