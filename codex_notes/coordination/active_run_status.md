@@ -1,17 +1,16 @@
 # Active Run Status
 
-Last updated: 2026-04-01 22:13 BST
+Last updated: 2026-04-02 00:50 BST
 
 ## Current local execution
 
-- Active wave: `rerun-tail`
+- Active wave: `latest-pr-tail`
 - Profile: `confirm`
-- Run tag: `rerun_tail_20260401`
-- Session: `60781`
-- Top-level PID: `79715`
-- Current experiment: `gptq_calib_self_generated`
+- Run tag: `latest_pr_tail_20260402`
+- Session: `86084`
+- Current experiment: `pr824_mimic`
 
-## Completed in this resumed pass
+## Completed reference waves
 
 - `xsa_all`
   - `final_int8_zlib_roundtrip_exact val_bpb: 1.68548359`
@@ -26,29 +25,20 @@ Last updated: 2026-04-01 22:13 BST
   - `final_int8_zlib_roundtrip_exact val_bpb: 1.69487012`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/gptq-self-calibration/logs/rerun_tail_20260401_gptq_calib_validation.txt`
 
-## Still queued inside `rerun-tail`
-
-- `gptq_calib_self_generated`
-- `gptq_calib_random_tokens`
-- `selective_post_gptq_pruning`
-- `rope_lnscale`
-- `splineconv_hybrid`
-
 ## Automatic follow-on
 
-- A second waiting session will launch the latest public-PR signal wave after `rerun-tail` exits.
-- Waiting session: `49354`
-- Follow-on run tag: `latest_pr_signal_20260401`
-- That follow-on wave will run:
-  - `baseline`
-  - `pr824_mimic`
-  - `qkgain5_pr1217`
-  - `parallel_residuals_pr1204`
-- A third waiting session will launch one extra cheap April 1 frontier mutation after the latest-PR summary file is written.
-- Waiting session: `95081`
-- Extra follow-on run:
-  - `wd085_mlp4_pr1218_confirm`
-  - partial `PR1218` mimic with `MLP_MULT=4` only
+- Current active wave:
+  - `latest_pr_tail_20260402`
+  - runs:
+    - `pr824_mimic`
+    - `qkgain5_pr1217`
+    - `parallel_residuals_pr1204`
+- Waiting session: `70197`
+  - runs partial `PR1218` port after `latest_pr_tail_20260402_summary.txt` appears
+  - run id:
+    - `wd085_mlp4_pr1218_confirm_20260402`
+- Waiting session: `82535`
+  - runs `pr824_exploit_20260402` after the partial `PR1218` run finishes
 
 ## Parallel research lane
 

@@ -10,6 +10,7 @@ profile="${2:-confirm}"
 run_tag="${RUN_TAG:-$(date +%Y%m%d_%H%M%S)}"
 seed="${SEED:-1337}"
 continue_on_error="${CONTINUE_ON_ERROR:-0}"
+use_caffeinate="${USE_CAFFEINATE:-1}"
 
 case "$profile" in
   screen)
@@ -32,7 +33,7 @@ case "$profile" in
     ;;
   *)
     echo "Unknown profile: $profile" >&2
-    echo "Usage: $0 [rerun-all|winner-focus] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac
@@ -60,6 +61,7 @@ require_dir() {
 run_case() {
   local label="$1"
   local dir="$2"
+  local stderr_log="$ROOT/logs/${run_tag}_${label}.stderr.txt"
   shift 2
   require_dir "$dir"
   echo
@@ -68,19 +70,24 @@ run_case() {
   set +e
   (
     cd "$dir"
-    env \
-      SEED="$seed" \
-      RUN_ID="${run_tag}_${label}" \
-      WARMUP_STEPS="$profile_warmup_steps" \
-      ITERATIONS="$profile_iterations" \
-      TRAIN_BATCH_TOKENS="$profile_train_batch_tokens" \
-      VAL_BATCH_SIZE="$profile_val_batch_size" \
-      DEV_VAL_MAX_BATCHES="$profile_dev_val_max_batches" \
-      SKIP_FINAL_INT8_EVAL="$profile_skip_final_int8_eval" \
-      MAX_WALLCLOCK_SECONDS="$profile_max_wallclock" \
-      MLX_EAGER_EVAL="$profile_mlx_eager_eval" \
-      MLX_MAX_MICROBATCH_TOKENS="$profile_mlx_max_microbatch_tokens" \
-      "$@"
+    local run_prefix=()
+    if [[ "$use_caffeinate" == "1" ]] && command -v caffeinate >/dev/null 2>&1; then
+      run_prefix=(caffeinate -dimsu)
+    fi
+    "${run_prefix[@]}" env \
+        SEED="$seed" \
+        RUN_ID="${run_tag}_${label}" \
+        WARMUP_STEPS="$profile_warmup_steps" \
+        ITERATIONS="$profile_iterations" \
+        TRAIN_BATCH_TOKENS="$profile_train_batch_tokens" \
+        VAL_BATCH_SIZE="$profile_val_batch_size" \
+        DEV_VAL_MAX_BATCHES="$profile_dev_val_max_batches" \
+        SKIP_FINAL_INT8_EVAL="$profile_skip_final_int8_eval" \
+        MAX_WALLCLOCK_SECONDS="$profile_max_wallclock" \
+        MLX_EAGER_EVAL="$profile_mlx_eager_eval" \
+        MLX_MAX_MICROBATCH_TOKENS="$profile_mlx_max_microbatch_tokens" \
+        "$@" \
+        2> "$stderr_log"
   )
   status=$?
   set -e
@@ -182,6 +189,42 @@ run_parallel_residuals_pr1204() {
     bash "$wrapper"
 }
 
+run_pr824_value_residual_only() {
+  run_case "pr824_value_residual_only" "$WORKTREES_ROOT/pr824-value-residual-only" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-value-residual-only/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_attn_gate_only() {
+  run_case "pr824_attn_gate_only" "$WORKTREES_ROOT/pr824-attn-gate-only" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-attn-gate-only/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_qkgain5() {
+  run_case "pr824_qkgain5" "$WORKTREES_ROOT/pr824-qkgain5" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-qkgain5/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_xsa4() {
+  run_case "pr824_xsa4" "$WORKTREES_ROOT/pr824-xsa4" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-xsa4/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_hyperconnection_lite() {
+  run_case "hyperconnection_lite" "$WORKTREES_ROOT/hyperconnection-lite" \
+    TRAIN_MLX_SCRIPT=experiments/hyperconnection-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_kgiir_lite() {
+  run_case "kgiir_lite" "$WORKTREES_ROOT/kgiir-lite" \
+    TRAIN_MLX_SCRIPT=experiments/kgiir-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -217,9 +260,27 @@ case "$wave" in
     run_qkgain5_pr1217
     run_parallel_residuals_pr1204
     ;;
+  latest-pr-tail)
+    run_pr824_mimic
+    run_qkgain5_pr1217
+    run_parallel_residuals_pr1204
+    ;;
+  pr824-exploit)
+    run_baseline
+    run_pr824_mimic
+    run_pr824_value_residual_only
+    run_pr824_attn_gate_only
+    run_pr824_qkgain5
+    run_pr824_xsa4
+    ;;
+  explore-lite)
+    run_baseline
+    run_hyperconnection_lite
+    run_kgiir_lite
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

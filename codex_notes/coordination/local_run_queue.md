@@ -70,6 +70,24 @@ That wave currently runs:
 3. `QK_GAIN=5.0` (`PR1217`-inspired)
 4. parallel residuals partial port (`PR1204`-inspired)
 
+## PR824 exploit wave
+
+After the latest-PR signal wave and the partial `PR1218` run, the next exploit-focused batch is:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh pr824-exploit confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. `PR824` value-residual-only
+4. `PR824` attn-gate-only
+5. `PR824 + QK_GAIN=5.0`
+6. `PR824` with `XSA_LAST_N=4`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:
