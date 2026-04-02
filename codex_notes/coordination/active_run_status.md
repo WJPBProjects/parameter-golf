@@ -1,14 +1,14 @@
 # Active Run Status
 
-Last updated: 2026-04-02 15:38 BST
+Last updated: 2026-04-02 15:55 BST
 
 ## Current local execution
 
-- Active wave: `next-frontier-lite`
+- Active wave: `pr824-fixups`
 - Profile: `confirm`
-- Run id: `next_frontier_lite_20260402`
-- Current session: `1044`
-- Current experiment: `mohd_lastmlp_lite`
+- Run id: `pr824_fixups_20260402`
+- Current session: `14285`
+- Current experiment: `baseline`
 
 ## Completed reference waves
 
@@ -112,15 +112,21 @@ Last updated: 2026-04-02 15:38 BST
   - `serialized_model_int8_zlib: 15300798 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-parallel-residuals/logs/next_frontier_lite_20260402_pr824_parallel_residuals.txt`
   - interpretation: real local win versus this wave's baseline (`-0.01848765`), but still weaker than plain `PR824 mimic`, so this is not yet evidence of positive composition
+- `next_frontier_lite_20260402` MoHD last-MLP lite:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69694169`
+  - `step_avg: 312.02ms`
+  - `serialized_model_int8_zlib: 15080319 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/mohd-lastmlp-lite/logs/next_frontier_lite_20260402_mohd_lastmlp_lite.txt`
+  - interpretation: effectively flat to slightly worse than the fresh baseline (`+0.00120123`), so this MoHD-style tail-gate is a local miss in this form
 
 ## Automatic follow-on
 
 - `latest_pr_tail_20260402` is complete and summarized in:
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
 - Waiting session: `1044`
-  - runs `next_frontier_lite_20260402` after `explore_lite_20260402_summary.txt` appears
+  - completed `next_frontier_lite_20260402`; summary at `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_summary.txt`
 - Waiting session: `14285`
-  - runs `pr824_fixups_20260402` after `next_frontier_lite_20260402_summary.txt` appears
+  - currently running `pr824_fixups_20260402`
 - Waiting session: `34638`
   - runs `pr824_stacks_20260402` after `pr824_fixups_20260402_summary.txt` appears
 - Waiting session: `60192`

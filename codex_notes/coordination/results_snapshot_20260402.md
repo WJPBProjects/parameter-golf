@@ -143,7 +143,7 @@ Interpretation:
 - `hyperconnection_lite` is a clear local miss at this initialization/topology, so drop it for now and keep the residual-routing explore budget on AttnRes-style variants instead
 - `kgiir_lite` is a stronger explore win than `attnres_lite` at a manageable speed cost, so the next obvious exploit branch is `PR824/value-residual + KGIIR-lite`
 
-## Active `next-frontier-lite` wave
+## Completed `next-frontier-lite` wave
 
 Fresh wave baseline:
 
@@ -151,10 +151,6 @@ Fresh wave baseline:
 - `final_int8_zlib_roundtrip_exact val_bpb: 1.69574046`
 - `step_avg: 325.78ms`
 - `serialized_model_int8_zlib: 15143021 bytes`
-
-Currently running:
-
-- `mohd_lastmlp_lite`
 
 First value-embedding attempt:
 
@@ -175,3 +171,21 @@ Interpretation:
 
 - this branch is clearly better than the fresh `next-frontier-lite` baseline
 - but it is not better than the PR824 mimic positive control from nearby waves, so ParallelResiduals still looks like a standalone win that does not obviously stack on top of the PR824 value/gate core
+
+MoHD last-MLP lite:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/mohd-lastmlp-lite/logs/next_frontier_lite_20260402_mohd_lastmlp_lite.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69694169`
+- `delta vs fresh baseline: +0.00120123`
+- `step_avg: 312.02ms`
+- `serialized_model_int8_zlib: 15080319 bytes`
+
+Interpretation:
+
+- quality is basically baseline to slightly worse, so this MoHD-style tail-channel gate is not worth another local slot unless we redesign the gate form or combine it with the value-residual family differently
+
+## Active `pr824-fixups` wave
+
+Currently running:
+
+- `baseline`
