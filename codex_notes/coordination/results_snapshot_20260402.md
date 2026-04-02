@@ -195,7 +195,7 @@ Fresh wave baseline:
 
 Currently running:
 
-- `pr824_qkgain5`
+- `pr824_xsa4`
 
 PR824 mimic positive control:
 
@@ -204,3 +204,16 @@ PR824 mimic positive control:
 - `delta vs fresh baseline: -0.02781349`
 - `step_avg: 336.05ms`
 - `serialized_model_int8_zlib: 15336584 bytes`
+
+PR824 + QK_GAIN=5.0:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-qkgain5/logs/pr824_fixups_20260402_pr824_qkgain5.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.66190993`
+- `delta vs fresh baseline: -0.03424075`
+- `delta vs PR824 mimic: -0.00642726`
+- `step_avg: 333.05ms`
+- `serialized_model_int8_zlib: 15403892 bytes`
+
+Interpretation:
+
+- this is the best local result so far and the first QK-gain variant with a clear positive signal when stacked on the PR824 value/gate core

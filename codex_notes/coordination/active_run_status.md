@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 16:33 BST
+Last updated: 2026-04-02 16:51 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 16:33 BST
 - Profile: `confirm`
 - Run id: `pr824_fixups_20260402`
 - Current session: `14285`
-- Current experiment: `pr824_qkgain5`
+- Current experiment: `pr824_xsa4`
 
 ## Completed reference waves
 
@@ -129,6 +129,12 @@ Last updated: 2026-04-02 16:33 BST
   - `serialized_model_int8_zlib: 15336584 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_fixups_20260402_pr824_mimic.txt`
   - interpretation: fresh positive control still improves by `-0.02781349` versus this wave's baseline, so the repaired `qkgain5` and `xsa4` comparisons are meaningful
+- `pr824_fixups_20260402` PR824 + QK_GAIN=5.0:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66190993`
+  - `step_avg: 333.05ms`
+  - `serialized_model_int8_zlib: 15403892 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-qkgain5/logs/pr824_fixups_20260402_pr824_qkgain5.txt`
+  - interpretation: new best local result so far (`-0.00642726` vs fresh PR824 mimic and `-0.03424075` vs baseline), so this branch should be treated as the current exploit target
 
 ## Automatic follow-on
 
