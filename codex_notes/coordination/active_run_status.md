@@ -1,14 +1,19 @@
 # Active Run Status
 
-Last updated: 2026-04-02 18:12 BST
+Last updated: 2026-04-02 18:48 BST
 
 ## Current local execution
 
-- Active wave: `pr824-stacks`
+- Active wave: `PAUSED`
 - Profile: `confirm`
-- Run id: `pr824_stacks_20260402`
-- Current session: `34638`
-- Current experiment: `pr824_kgiir_lite`
+- Run id: `none`
+- Current session: `none`
+- Current experiment: `none`
+
+## Pause reason
+
+- User asked to pause after the next run finished and summarize.
+- `pr824_kgiir_lite` completed, `pr824_attnres_lite` failed at startup, and all queued `run_local_wave.sh` / `train_gpt_mlx.py` processes were terminated.
 
 ## Completed reference waves
 
@@ -153,6 +158,16 @@ Last updated: 2026-04-02 18:12 BST
   - `serialized_model_int8_zlib: 15335597 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_stacks_20260402_pr824_mimic.txt`
   - interpretation: fresh positive control still clears the baseline by `-0.02678339`, so this stack wave is healthy enough to judge `pr824_kgiir_lite` and `pr824_attnres_lite`
+- `pr824_stacks_20260402` PR824 + KGIIR-lite:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.65947391`
+  - `step_avg: 348.85ms`
+  - `serialized_model_int8_zlib: 15353184 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-kgiir-lite/logs/pr824_stacks_20260402_pr824_kgiir_lite.txt`
+  - interpretation: new best local result so far (`-0.03501924` vs baseline, `-0.00823585` vs fresh PR824 mimic, `-0.00243602` vs `pr824-qkgain5`) with a moderate speed cost
+- `pr824_stacks_20260402` PR824 + AttnRes-lite:
+  - failed immediately with `TypeError: GPT.__init__() got an unexpected keyword argument 'attnres_enable'`
+  - stderr: `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_pr824_attnres_lite.stderr.txt`
+  - interpretation: this is a branch plumbing bug, not evidence against the idea itself
 
 ## Automatic follow-on
 
@@ -161,15 +176,15 @@ Last updated: 2026-04-02 18:12 BST
 - Waiting session: `1044`
   - completed `next_frontier_lite_20260402`; summary at `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_summary.txt`
 - Waiting session: `34638`
-  - currently running `pr824_stacks_20260402`
+  - stopped
 - Waiting session: `60192`
-  - runs `pr824_explore2_20260402` after `pr824_stacks_20260402_summary.txt` appears
+  - stopped
 - Waiting session: `45526`
-  - runs `value_embedding_retry_20260402` after `pr824_explore2_20260402_summary.txt` appears
+  - stopped
 - Waiting session: `84238`
-  - runs `qkgain_neighborhood_20260402` after `value_embedding_retry_20260402_summary.txt` appears
+  - stopped
 - Waiting session: `36684`
-  - runs `next_exploit_frontier_20260402` after `qkgain_neighborhood_20260402_summary.txt` appears
+  - stopped
 
 ## Parallel research lane
 

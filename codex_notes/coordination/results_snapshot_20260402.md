@@ -227,7 +227,7 @@ Interpretation:
 
 - `XSA_LAST_N=4` is still a clear win over the baseline and slightly faster/smaller than the full PR824 mimic branch, but the quality drop relative to XSA6 is large enough that this is an ablation result, not the current best exploit path
 
-## Active `pr824-stacks` wave
+## Paused after partial `pr824-stacks` wave
 
 Fresh wave baseline:
 
@@ -236,10 +236,6 @@ Fresh wave baseline:
 - `step_avg: 340.85ms`
 - `serialized_model_int8_zlib: 15135923 bytes`
 
-Currently running:
-
-- `pr824_kgiir_lite`
-
 PR824 mimic positive control:
 
 - `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_stacks_20260402_pr824_mimic.txt`
@@ -247,6 +243,31 @@ PR824 mimic positive control:
 - `delta vs fresh baseline: -0.02678339`
 - `step_avg: 321.79ms`
 - `serialized_model_int8_zlib: 15335597 bytes`
+
+PR824 + KGIIR-lite:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-kgiir-lite/logs/pr824_stacks_20260402_pr824_kgiir_lite.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.65947391`
+- `delta vs fresh baseline: -0.03501924`
+- `delta vs PR824 mimic: -0.00823585`
+- `delta vs previous best pr824_qkgain5: -0.00243602`
+- `step_avg: 348.85ms`
+- `serialized_model_int8_zlib: 15353184 bytes`
+
+Interpretation:
+
+- this is the best local result so far and the strongest evidence yet that a lightweight temporal mixer can compose positively with the PR824 value/gate/XSA path
+- the tradeoff is a moderate speed slowdown versus plain PR824 mimic and `pr824-qkgain5`
+
+PR824 + AttnRes-lite:
+
+- startup failure:
+  - `TypeError: GPT.__init__() got an unexpected keyword argument 'attnres_enable'`
+  - stderr: `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_pr824_attnres_lite.stderr.txt`
+
+Interpretation:
+
+- this branch is currently blocked by a constructor/plumbing bug, so the failed run should not be interpreted as a quality result
 
 Queued in this wave:
 
