@@ -186,6 +186,13 @@ Interpretation:
 
 ## Active `pr824-fixups` wave
 
+Fresh wave baseline:
+
+- `/Users/wulfie/code/parameter-golf/logs/pr824_fixups_20260402_baseline.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69615068`
+- `step_avg: 310.25ms`
+- `serialized_model_int8_zlib: 15136050 bytes`
+
 Currently running:
 
-- `baseline`
+- `pr824_mimic`

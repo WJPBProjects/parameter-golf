@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 15:55 BST
+Last updated: 2026-04-02 16:10 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 15:55 BST
 - Profile: `confirm`
 - Run id: `pr824_fixups_20260402`
 - Current session: `14285`
-- Current experiment: `baseline`
+- Current experiment: `pr824_mimic`
 
 ## Completed reference waves
 
@@ -118,6 +118,11 @@ Last updated: 2026-04-02 15:55 BST
   - `serialized_model_int8_zlib: 15080319 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/mohd-lastmlp-lite/logs/next_frontier_lite_20260402_mohd_lastmlp_lite.txt`
   - interpretation: effectively flat to slightly worse than the fresh baseline (`+0.00120123`), so this MoHD-style tail-gate is a local miss in this form
+- `pr824_fixups_20260402` baseline:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69615068`
+  - `step_avg: 310.25ms`
+  - `serialized_model_int8_zlib: 15136050 bytes`
+  - log: `/Users/wulfie/code/parameter-golf/logs/pr824_fixups_20260402_baseline.txt`
 
 ## Automatic follow-on
 
