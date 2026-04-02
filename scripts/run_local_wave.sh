@@ -33,7 +33,7 @@ case "$profile" in
     ;;
   *)
     echo "Unknown profile: $profile" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac
@@ -249,6 +249,18 @@ run_mohd_lastmlp_lite() {
     bash "$wrapper"
 }
 
+run_pr824_kgiir_lite() {
+  run_case "pr824_kgiir_lite" "$WORKTREES_ROOT/pr824-kgiir-lite" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-kgiir-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_attnres_lite() {
+  run_case "pr824_attnres_lite" "$WORKTREES_ROOT/pr824-attnres-lite" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-attnres-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -315,9 +327,15 @@ case "$wave" in
     run_pr824_qkgain5
     run_pr824_xsa4
     ;;
+  pr824-stacks)
+    run_baseline
+    run_pr824_mimic
+    run_pr824_kgiir_lite
+    run_pr824_attnres_lite
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

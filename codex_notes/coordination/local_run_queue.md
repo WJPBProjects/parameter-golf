@@ -138,6 +138,22 @@ That wave runs:
 3. repaired `PR824 + QK_GAIN=5.0`
 4. repaired `PR824` with `XSA_LAST_N=4`
 
+## PR824 stacks wave
+
+After `pr824-fixups`, run the prepared composite branches that stack the current best PR824 core with the two strongest explore wins:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh pr824-stacks confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. `PR824 + KGIIR-lite`
+4. `PR824 + AttnRes-lite`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:

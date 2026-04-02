@@ -105,6 +105,8 @@ Last updated: 2026-04-02 14:20 BST
   - runs `next_frontier_lite_20260402` after `explore_lite_20260402_summary.txt` appears
 - Waiting session: `14285`
   - runs `pr824_fixups_20260402` after `next_frontier_lite_20260402_summary.txt` appears
+- Waiting session: `34638`
+  - runs `pr824_stacks_20260402` after `pr824_fixups_20260402_summary.txt` appears
 
 ## Parallel research lane
 
