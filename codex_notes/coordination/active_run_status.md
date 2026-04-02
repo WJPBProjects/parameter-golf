@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 13:18 BST
+Last updated: 2026-04-02 13:40 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 13:18 BST
 - Profile: `confirm`
 - Run id: `explore_lite_20260402`
 - Current session: `20353`
-- Current experiment: `attnres_lite`
+- Current experiment: `hyperconnection_lite`
 
 ## Completed reference waves
 
@@ -78,6 +78,12 @@ Last updated: 2026-04-02 13:18 BST
   - `step_avg: 303.23ms`
   - `serialized_model_int8_zlib: 15128268 bytes`
   - log: `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`
+- `explore_lite_20260402` attnres-lite:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.68501439`
+  - `step_avg: 315.04ms`
+  - `serialized_model_int8_zlib: 15311780 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite/logs/explore_lite_20260402_attnres_lite.txt`
+  - interpretation: a real but modest win (`-0.00738552` vs fresh baseline) at about `+3.9%` step-time cost, so this is a secondary positive explore direction
 
 ## Automatic follow-on
 

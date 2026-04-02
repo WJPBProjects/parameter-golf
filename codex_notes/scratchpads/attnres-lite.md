@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `attnres-lite`
-- Status: `IN_PROGRESS:main-agent`
+- Status: `PASS`
 - Owner: `main-agent`
 - Branch: `codex/attnres-lite`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite`
@@ -20,5 +20,14 @@
 
 ## Next step
 
-- Currently running in `explore_lite_20260402`.
-- Compare final post-quant BPB against fresh baseline `1.69239991` from `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`.
+- Result from `explore_lite_20260402`:
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite/logs/explore_lite_20260402_attnres_lite.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.68501439`
+  - fresh baseline: `1.69239991`
+  - `step_avg: 315.04ms`
+  - `serialized_model_int8_zlib: 15311780 bytes`
+- Interpretation:
+  - Modest but real local win with a small speed and size cost.
+  - This is weaker than PR824/value-residual-only, but strong enough to justify one stack experiment.
+- Next step:
+  - Prepare `pr824 + attnres-lite` or `value-residual-only + attnres-lite` once the current queue drains.

@@ -111,7 +111,16 @@ Fresh wave baseline:
 - `step_avg: 303.23ms`
 - `serialized_model_int8_zlib: 15128268 bytes`
 
+AttnRes-lite:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite/logs/explore_lite_20260402_attnres_lite.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.68501439`
+- `delta vs fresh baseline: -0.00738552`
+- `step_avg: 315.04ms`
+- `serialized_model_int8_zlib: 15311780 bytes`
+
 Interpretation:
 
 - this baseline is close to the historical confirm baseline (`-0.00039599` better than `1.69279590`)
 - use this fresh baseline, not the `pr824-exploit` baseline, for `attnres_lite`, `hyperconnection_lite`, and `kgiir_lite`
+- `attnres_lite` is a modest but real local win and stays under the 16MB artifact cap, so this residual-routing family deserves one follow-up stack on top of `PR824` or `value-residual-only`
