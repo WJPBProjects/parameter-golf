@@ -273,6 +273,12 @@ run_pr824_diffattn_lite() {
     bash "$wrapper"
 }
 
+run_pr824_no_xsa() {
+  run_case "pr824_no_xsa" "$WORKTREES_ROOT/pr824-no-xsa" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-no-xsa/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -348,6 +354,7 @@ case "$wave" in
   pr824-explore2)
     run_baseline
     run_pr824_mimic
+    run_pr824_no_xsa
     run_pr824_soft_xsa
     run_pr824_diffattn_lite
     ;;
