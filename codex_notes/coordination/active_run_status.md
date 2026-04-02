@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 12:15 BST
+Last updated: 2026-04-02 12:28 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 12:15 BST
 - Profile: `confirm`
 - Run id: `pr824_exploit_20260402`
 - Current session: `67770`
-- Current experiment: `pr824_value_residual_only`
+- Current experiment: `pr824_attn_gate_only`
 
 ## Completed reference waves
 
@@ -55,6 +55,13 @@ Last updated: 2026-04-02 12:15 BST
   - `serialized_model_int8_zlib: 15336317 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_exploit_20260402_pr824_mimic.txt`
   - interpretation: the positive control still beats the fresh wave baseline by `-0.02786596`, so the ablation ranking in this wave is trustworthy
+- `pr824_exploit_20260402` value-residual-only ablation:
+  - `pr824_value_residual_only`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67099164`
+  - `step_avg: 324.12ms`
+  - `serialized_model_int8_zlib: 15395185 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-value-residual-only/logs/pr824_exploit_20260402_pr824_value_residual_only.txt`
+  - interpretation: retains almost all of the PR824-family gain by itself (`-0.02502289` vs baseline, only `+0.00284307` worse than full PR824 mimic), so the value-residual path is confirmed as the main mechanism
 
 ## Automatic follow-on
 
