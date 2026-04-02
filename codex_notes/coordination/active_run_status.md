@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 14:54 BST
+Last updated: 2026-04-02 15:24 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 14:54 BST
 - Profile: `confirm`
 - Run id: `next_frontier_lite_20260402`
 - Current session: `1044`
-- Current experiment: `pr824_value_embedding_lite`
+- Current experiment: `pr824_parallel_residuals`
 
 ## Completed reference waves
 
@@ -101,6 +101,11 @@ Last updated: 2026-04-02 14:54 BST
   - `step_avg: 325.78ms`
   - `serialized_model_int8_zlib: 15143021 bytes`
   - log: `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_baseline.txt`
+- `next_frontier_lite_20260402` value-embedding first attempt:
+  - pre-quant `step:4000/4000 val_bpb: 1.6884`
+  - run exited `1` at `mx.savez(...flat_state)` with `RuntimeError: std::bad_cast`
+  - stderr: `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_pr824_value_embedding_lite.stderr.txt`
+  - root cause: non-array Python metadata leaves in `model.state`; branch-local fix is prepared and this experiment needs a clean rerun
 
 ## Automatic follow-on
 
@@ -114,6 +119,8 @@ Last updated: 2026-04-02 14:54 BST
   - runs `pr824_stacks_20260402` after `pr824_fixups_20260402_summary.txt` appears
 - Waiting session: `60192`
   - runs `pr824_explore2_20260402` after `pr824_stacks_20260402_summary.txt` appears
+- Waiting session: `45526`
+  - runs `value_embedding_retry_20260402` after `pr824_explore2_20260402_summary.txt` appears
 
 ## Parallel research lane
 

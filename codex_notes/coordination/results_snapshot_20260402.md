@@ -154,4 +154,11 @@ Fresh wave baseline:
 
 Currently running:
 
-- `pr824_value_embedding_lite`
+- `pr824_parallel_residuals`
+
+First value-embedding attempt:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-value-embedding-lite/logs/next_frontier_lite_20260402_pr824_value_embedding_lite.txt`
+- pre-quant `step:4000/4000 val_bpb: 1.6884`
+- run exited `1` during `mx.savez` with `RuntimeError: std::bad_cast`
+- branch-local fix is prepared; do not score this branch until a clean post-quant rerun lands

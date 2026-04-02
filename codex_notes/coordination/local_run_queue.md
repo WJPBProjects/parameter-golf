@@ -172,6 +172,15 @@ That wave runs:
 5. `PR824 + soft XSA`
 6. `PR824 + DiffAttn-lite`
 
+## Value-embedding retry wave
+
+The first `PR824 + value-embedding-lite` attempt trained to pre-quant `val_bpb: 1.6884` but failed during `mx.savez` because of non-array Python metadata in `model.state`. The branch-local bug is fixed, so run a clean retry after `pr824-explore2`:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh value-embedding-retry confirm
+```
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:
