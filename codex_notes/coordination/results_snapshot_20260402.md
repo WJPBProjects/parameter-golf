@@ -142,3 +142,16 @@ Interpretation:
 - `attnres_lite` is a modest but real local win and stays under the 16MB artifact cap, so this residual-routing family deserves one follow-up stack on top of `PR824` or `value-residual-only`
 - `hyperconnection_lite` is a clear local miss at this initialization/topology, so drop it for now and keep the residual-routing explore budget on AttnRes-style variants instead
 - `kgiir_lite` is a stronger explore win than `attnres_lite` at a manageable speed cost, so the next obvious exploit branch is `PR824/value-residual + KGIIR-lite`
+
+## Active `next-frontier-lite` wave
+
+Fresh wave baseline:
+
+- `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_baseline.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69574046`
+- `step_avg: 325.78ms`
+- `serialized_model_int8_zlib: 15143021 bytes`
+
+Currently running:
+
+- `pr824_value_embedding_lite`

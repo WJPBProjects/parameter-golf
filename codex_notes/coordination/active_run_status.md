@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 14:45 BST
+Last updated: 2026-04-02 14:54 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 14:45 BST
 - Profile: `confirm`
 - Run id: `next_frontier_lite_20260402`
 - Current session: `1044`
-- Current experiment: `baseline`
+- Current experiment: `pr824_value_embedding_lite`
 
 ## Completed reference waves
 
@@ -96,6 +96,11 @@ Last updated: 2026-04-02 14:45 BST
   - `serialized_model_int8_zlib: 15173162 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite/logs/explore_lite_20260402_kgiir_lite.txt`
   - interpretation: stronger local win than `attnres_lite` (`-0.01677831` vs fresh baseline), so this branch deserves one `PR824/value-residual + KGIIR-lite` stack test
+- `next_frontier_lite_20260402` baseline:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69574046`
+  - `step_avg: 325.78ms`
+  - `serialized_model_int8_zlib: 15143021 bytes`
+  - log: `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_baseline.txt`
 
 ## Automatic follow-on
 
