@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 16:10 BST
+Last updated: 2026-04-02 16:33 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 16:10 BST
 - Profile: `confirm`
 - Run id: `pr824_fixups_20260402`
 - Current session: `14285`
-- Current experiment: `pr824_mimic`
+- Current experiment: `pr824_qkgain5`
 
 ## Completed reference waves
 
@@ -123,6 +123,12 @@ Last updated: 2026-04-02 16:10 BST
   - `step_avg: 310.25ms`
   - `serialized_model_int8_zlib: 15136050 bytes`
   - log: `/Users/wulfie/code/parameter-golf/logs/pr824_fixups_20260402_baseline.txt`
+- `pr824_fixups_20260402` PR824 mimic positive control:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66833719`
+  - `step_avg: 336.05ms`
+  - `serialized_model_int8_zlib: 15336584 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_fixups_20260402_pr824_mimic.txt`
+  - interpretation: fresh positive control still improves by `-0.02781349` versus this wave's baseline, so the repaired `qkgain5` and `xsa4` comparisons are meaningful
 
 ## Automatic follow-on
 

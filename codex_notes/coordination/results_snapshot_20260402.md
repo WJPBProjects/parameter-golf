@@ -195,4 +195,12 @@ Fresh wave baseline:
 
 Currently running:
 
-- `pr824_mimic`
+- `pr824_qkgain5`
+
+PR824 mimic positive control:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_fixups_20260402_pr824_mimic.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.66833719`
+- `delta vs fresh baseline: -0.02781349`
+- `step_avg: 336.05ms`
+- `serialized_model_int8_zlib: 15336584 bytes`
