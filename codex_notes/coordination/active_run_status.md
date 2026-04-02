@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 14:20 BST
+Last updated: 2026-04-02 14:45 BST
 
 ## Current local execution
 
@@ -107,6 +107,8 @@ Last updated: 2026-04-02 14:20 BST
   - runs `pr824_fixups_20260402` after `next_frontier_lite_20260402_summary.txt` appears
 - Waiting session: `34638`
   - runs `pr824_stacks_20260402` after `pr824_fixups_20260402_summary.txt` appears
+- Waiting session: `60192`
+  - runs `pr824_explore2_20260402` after `pr824_stacks_20260402_summary.txt` appears
 
 ## Parallel research lane
 

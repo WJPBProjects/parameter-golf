@@ -154,6 +154,22 @@ That wave runs:
 3. `PR824 + KGIIR-lite`
 4. `PR824 + AttnRes-lite`
 
+## PR824 explore2 wave
+
+After `pr824-stacks`, run the two lighter attention-side PR824 variants from the frontier refresh:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh pr824-explore2 confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. `PR824 + soft XSA`
+4. `PR824 + DiffAttn-lite`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:
