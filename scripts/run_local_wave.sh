@@ -33,7 +33,7 @@ case "$profile" in
     ;;
   *)
     echo "Unknown profile: $profile" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac
@@ -309,9 +309,15 @@ case "$wave" in
     run_pr824_parallel_residuals
     run_mohd_lastmlp_lite
     ;;
+  pr824-fixups)
+    run_baseline
+    run_pr824_mimic
+    run_pr824_qkgain5
+    run_pr824_xsa4
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

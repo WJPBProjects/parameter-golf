@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 12:51 BST
+Last updated: 2026-04-02 13:04 BST
 
 ## Current local execution
 
@@ -70,9 +70,9 @@ Last updated: 2026-04-02 12:51 BST
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-attn-gate-only/logs/pr824_exploit_20260402_pr824_attn_gate_only.txt`
   - interpretation: attention gating alone is a real but smaller win (`-0.01502807` vs baseline), clearly weaker than value residual only and full PR824 mimic
 - `pr824_exploit_20260402` invalid fixup cases:
-  - `pr824_qkgain5` exited `143` after manual stop because the branch trainer is only standalone `QK_GAIN=5.0`, not PR824 + QK gain
-  - `pr824_xsa4` exited `143` after manual stop because the branch trainer still logs `xsa_last_n:6`, not `4`
-  - both branches need code/config repair before rerunning
+  - `pr824_qkgain5` exited `143` after manual stop because the branch trainer was only standalone `QK_GAIN=5.0`, not PR824 + QK gain
+  - `pr824_xsa4` exited `143` after manual stop because the branch trainer still logged `xsa_last_n:6`, not `4`
+  - both branches have now been repaired by dedicated workers and are queued for a fresh `pr824-fixups` wave
 
 ## Automatic follow-on
 
@@ -80,6 +80,8 @@ Last updated: 2026-04-02 12:51 BST
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
 - Waiting session: `1044`
   - runs `next_frontier_lite_20260402` after `explore_lite_20260402_summary.txt` appears
+- Waiting session: `14285`
+  - runs `pr824_fixups_20260402` after `next_frontier_lite_20260402_summary.txt` appears
 
 ## Parallel research lane
 

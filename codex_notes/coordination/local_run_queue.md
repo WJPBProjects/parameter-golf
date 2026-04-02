@@ -120,6 +120,24 @@ That wave should run:
 3. `PR824 + ParallelResiduals`
 4. `MoHD last-MLP lite`
 
+## PR824 fixups wave
+
+`pr824-qkgain5` and `pr824-xsa4` were repaired after their first `pr824-exploit` attempts were manually stopped because the branch configs were wrong.
+
+Run this wave after `next-frontier-lite`:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh pr824-fixups confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. repaired `PR824 + QK_GAIN=5.0`
+4. repaired `PR824` with `XSA_LAST_N=4`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:

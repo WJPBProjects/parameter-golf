@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `pr824-xsa4`
-- Status: `BLOCKED`
+- Status: `TODO`
 - Owner: `main-agent`
 - Branch: `codex/pr824-xsa4`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/pr824-xsa4`
@@ -20,9 +20,9 @@
 
 ## Next step
 
-- This branch is currently misconfigured.
-  - During `pr824_exploit_20260402`, the trainer log printed `xsa_last_n:6`, so it was not testing the intended `XSA_LAST_N=4` ablation.
-  - The run was manually killed.
-- Required fix before rerun:
-  - change the branch trainer default to `XSA_LAST_N=4` or update the runner to pass `XSA_LAST_N=4` explicitly.
-  - rerun this branch only after the fix is confirmed in the startup logs.
+- The first `pr824_exploit_20260402` attempt was manually killed because the branch trainer still defaulted to `XSA_LAST_N=6`.
+- That bug is now repaired in the branch worktree:
+  - `experiments/pr824-xsa4/train_gpt_mlx.py` now defaults `XSA_LAST_N=4`
+  - the PR824 mimic attn-gate/value-residual wiring and startup logging remain intact
+  - `python -m py_compile` passed
+- Rerun this branch in the `pr824-fixups` wave and verify the startup log prints `xsa_last_n:4`.

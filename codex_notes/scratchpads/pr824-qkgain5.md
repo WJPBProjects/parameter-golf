@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `pr824-qkgain5`
-- Status: `BLOCKED`
+- Status: `TODO`
 - Owner: `main-agent`
 - Branch: `codex/pr824-qkgain5`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/pr824-qkgain5`
@@ -20,9 +20,10 @@
 
 ## Next step
 
-- This branch is currently misconfigured.
-  - During `pr824_exploit_20260402`, the trainer log did not show the PR824 mimic flags, and a direct source check only found `QK_GAIN_INIT=5.0` without the PR824 value-residual / attn-gate implementation.
-  - The run was manually killed.
-- Required fix before rerun:
-  - rebuild `experiments/pr824-qkgain5/train_gpt_mlx.py` from the PR824 mimic trainer and then set `QK_GAIN_INIT=5.0` on top of that stack.
-  - update the runner so this case passes `QK_GAIN_INIT=5.0` explicitly.
+- The first `pr824_exploit_20260402` attempt was manually killed because the branch trainer was only standalone `QK_GAIN=5.0`, not PR824 + QK gain.
+- That bug is now repaired in the branch worktree:
+  - `experiments/pr824-qkgain5/train_gpt_mlx.py` was rebuilt from the PR824 mimic trainer
+  - `QK_GAIN_INIT` now defaults to `5.0`
+  - `xsa_last_n=6`, `attn_gate`, and `value_residual` source paths are present again
+  - `python -m py_compile` passed
+- Rerun this branch in the `pr824-fixups` wave and verify the startup log shows both the PR824 flags and the intended QK-gain setting.
