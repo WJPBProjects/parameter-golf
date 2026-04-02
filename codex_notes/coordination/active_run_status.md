@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 17:50 BST
+Last updated: 2026-04-02 18:12 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 17:50 BST
 - Profile: `confirm`
 - Run id: `pr824_stacks_20260402`
 - Current session: `34638`
-- Current experiment: `pr824_mimic`
+- Current experiment: `pr824_kgiir_lite`
 
 ## Completed reference waves
 
@@ -147,6 +147,12 @@ Last updated: 2026-04-02 17:50 BST
   - `serialized_model_int8_zlib: 15135923 bytes`
   - log: `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_baseline.txt`
   - interpretation: use this baseline as the reference for `pr824_kgiir_lite` and `pr824_attnres_lite` in the current stack wave
+- `pr824_stacks_20260402` PR824 mimic positive control:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66770976`
+  - `step_avg: 321.79ms`
+  - `serialized_model_int8_zlib: 15335597 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_stacks_20260402_pr824_mimic.txt`
+  - interpretation: fresh positive control still clears the baseline by `-0.02678339`, so this stack wave is healthy enough to judge `pr824_kgiir_lite` and `pr824_attnres_lite`
 
 ## Automatic follow-on
 
