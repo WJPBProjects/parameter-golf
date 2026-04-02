@@ -181,6 +181,23 @@ cd /Users/wulfie/code/parameter-golf
 CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh value-embedding-retry confirm
 ```
 
+## QK-gain neighborhood wave
+
+After the repaired value-embedding retry, sweep the neighborhood around the current `PR824 + QK_GAIN=5.0` local winner:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh qkgain-neighborhood confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. `PR824 + QK_GAIN=4.5`
+4. `PR824 + QK_GAIN=5.0`
+5. `PR824 + QK_GAIN=6.0`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:

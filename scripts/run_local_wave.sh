@@ -33,7 +33,7 @@ case "$profile" in
     ;;
   *)
     echo "Unknown profile: $profile" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks|pr824-explore2|value-embedding-retry] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks|pr824-explore2|value-embedding-retry|qkgain-neighborhood] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac
@@ -285,6 +285,18 @@ run_pr824_valres_init020() {
     bash "$wrapper"
 }
 
+run_pr824_qkgain45() {
+  run_case "pr824_qkgain45" "$WORKTREES_ROOT/pr824-qkgain45" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-qkgain45/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_qkgain6() {
+  run_case "pr824_qkgain6" "$WORKTREES_ROOT/pr824-qkgain6" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-qkgain6/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -369,9 +381,16 @@ case "$wave" in
     run_baseline
     run_pr824_value_embedding_lite
     ;;
+  qkgain-neighborhood)
+    run_baseline
+    run_pr824_mimic
+    run_pr824_qkgain45
+    run_pr824_qkgain5
+    run_pr824_qkgain6
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks|pr824-explore2|value-embedding-retry] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite|pr824-fixups|pr824-stacks|pr824-explore2|value-embedding-retry|qkgain-neighborhood] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

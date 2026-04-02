@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 16:51 BST
+Last updated: 2026-04-02 17:08 BST
 
 ## Current local execution
 
@@ -150,6 +150,8 @@ Last updated: 2026-04-02 16:51 BST
   - runs `pr824_explore2_20260402` after `pr824_stacks_20260402_summary.txt` appears
 - Waiting session: `45526`
   - runs `value_embedding_retry_20260402` after `pr824_explore2_20260402_summary.txt` appears
+- Waiting session: `84238`
+  - runs `qkgain_neighborhood_20260402` after `value_embedding_retry_20260402_summary.txt` appears
 
 ## Parallel research lane
 
