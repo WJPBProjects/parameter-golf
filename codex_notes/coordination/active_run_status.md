@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 11:52 BST
+Last updated: 2026-04-02 12:15 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 11:52 BST
 - Profile: `confirm`
 - Run id: `pr824_exploit_20260402`
 - Current session: `67770`
-- Current experiment: `pr824_mimic`
+- Current experiment: `pr824_value_residual_only`
 
 ## Completed reference waves
 
@@ -48,6 +48,13 @@ Last updated: 2026-04-02 11:52 BST
   - `step_avg: 323.76ms`
   - `serialized_model_int8_zlib: 15128342 bytes`
   - log: `/Users/wulfie/code/parameter-golf/logs/pr824_exploit_20260402_baseline.txt`
+- `pr824_exploit_20260402` positive control:
+  - `pr824_mimic`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66814857`
+  - `step_avg: 310.41ms`
+  - `serialized_model_int8_zlib: 15336317 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_exploit_20260402_pr824_mimic.txt`
+  - interpretation: the positive control still beats the fresh wave baseline by `-0.02786596`, so the ablation ranking in this wave is trustworthy
 
 ## Automatic follow-on
 

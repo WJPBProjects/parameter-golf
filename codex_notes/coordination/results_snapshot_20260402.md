@@ -67,7 +67,16 @@ Fresh wave baseline:
 - `step_avg: 323.76ms`
 - `serialized_model_int8_zlib: 15128342 bytes`
 
+Positive control:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_exploit_20260402_pr824_mimic.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.66814857`
+- `delta vs fresh baseline: -0.02786596`
+- `step_avg: 310.41ms`
+- `serialized_model_int8_zlib: 15336317 bytes`
+
 Interpretation:
 
 - this baseline is `+0.00321863` worse than the earlier `rerun_wave_20260401` confirm baseline
 - that amount of drift is small enough that the wave is still usable, but borderline deltas in the `0.003` range should be treated carefully
+- the PR824 positive control still wins by a wide margin and is slightly faster than the fresh baseline in this run, so this wave is healthy enough to trust the value-residual and attn-gate ablations

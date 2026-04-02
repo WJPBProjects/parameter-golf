@@ -52,6 +52,23 @@
   - `XSA6` alone did not help.
   - `value_residual` drove most of the gain.
 
+## Fresh confirm check
+
+- Run tag: `pr824_exploit_20260402`
+- Date: `2026-04-02`
+- Log path:
+  - `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/pr824_exploit_20260402_pr824_mimic.txt`
+- Fresh baseline:
+  - `/Users/wulfie/code/parameter-golf/logs/pr824_exploit_20260402_baseline.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69601453`
+- Positive-control result:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66814857`
+  - `step_avg: 310.41ms`
+  - `serialized_model_int8_zlib: 15336317 bytes`
+- Interpretation:
+  - Still a strong win versus the fresh wave baseline (`-0.02786596 bpb`).
+  - This keeps PR824 mimic valid as the main positive control for the current exploit wave.
+
 ## Promotion Decision
 
 - Promote to remote: READY
