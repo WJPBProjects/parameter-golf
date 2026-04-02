@@ -1,14 +1,14 @@
 # Active Run Status
 
-Last updated: 2026-04-02 12:28 BST
+Last updated: 2026-04-02 12:51 BST
 
 ## Current local execution
 
-- Active wave: `pr824-exploit`
+- Active wave: `explore-lite`
 - Profile: `confirm`
-- Run id: `pr824_exploit_20260402`
-- Current session: `67770`
-- Current experiment: `pr824_attn_gate_only`
+- Run id: `explore_lite_20260402`
+- Current session: `20353`
+- Current experiment: `baseline`
 
 ## Completed reference waves
 
@@ -62,13 +62,22 @@ Last updated: 2026-04-02 12:28 BST
   - `serialized_model_int8_zlib: 15395185 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-value-residual-only/logs/pr824_exploit_20260402_pr824_value_residual_only.txt`
   - interpretation: retains almost all of the PR824-family gain by itself (`-0.02502289` vs baseline, only `+0.00284307` worse than full PR824 mimic), so the value-residual path is confirmed as the main mechanism
+- `pr824_exploit_20260402` attn-gate-only ablation:
+  - `pr824_attn_gate_only`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.68098646`
+  - `step_avg: 322.27ms`
+  - `serialized_model_int8_zlib: 15104730 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-attn-gate-only/logs/pr824_exploit_20260402_pr824_attn_gate_only.txt`
+  - interpretation: attention gating alone is a real but smaller win (`-0.01502807` vs baseline), clearly weaker than value residual only and full PR824 mimic
+- `pr824_exploit_20260402` invalid fixup cases:
+  - `pr824_qkgain5` exited `143` after manual stop because the branch trainer is only standalone `QK_GAIN=5.0`, not PR824 + QK gain
+  - `pr824_xsa4` exited `143` after manual stop because the branch trainer still logs `xsa_last_n:6`, not `4`
+  - both branches need code/config repair before rerunning
 
 ## Automatic follow-on
 
 - `latest_pr_tail_20260402` is complete and summarized in:
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
-- Waiting session: `20353`
-  - runs `explore_lite_20260402` after `pr824_exploit_20260402_summary.txt` appears
 - Waiting session: `1044`
   - runs `next_frontier_lite_20260402` after `explore_lite_20260402_summary.txt` appears
 

@@ -84,9 +84,20 @@ Value-residual-only ablation:
 - `step_avg: 324.12ms`
 - `serialized_model_int8_zlib: 15395185 bytes`
 
+Attn-gate-only ablation:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-attn-gate-only/logs/pr824_exploit_20260402_pr824_attn_gate_only.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.68098646`
+- `delta vs fresh baseline: -0.01502807`
+- `delta vs value-residual-only: +0.00999482`
+- `step_avg: 322.27ms`
+- `serialized_model_int8_zlib: 15104730 bytes`
+
 Interpretation:
 
 - this baseline is `+0.00321863` worse than the earlier `rerun_wave_20260401` confirm baseline
 - that amount of drift is small enough that the wave is still usable, but borderline deltas in the `0.003` range should be treated carefully
 - the PR824 positive control still wins by a wide margin and is slightly faster than the fresh baseline in this run, so this wave is healthy enough to trust the value-residual and attn-gate ablations
 - `value_residual_only` keeps almost all of the full PR824 gain, so the value path is very likely the dominant mechanism and attention gating should be treated as an incremental add-on unless the next ablation contradicts that
+- `attn_gate_only` is still helpful, but materially weaker than `value_residual_only`; the clean working theory now is "value residual is the main lever, attention gate is a smaller stackable gain"
+- `pr824_qkgain5` and `pr824_xsa4` were manually stopped because their branch configs did not match the intended experiment definitions, so they should be ignored until repaired

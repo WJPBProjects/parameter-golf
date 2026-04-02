@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `pr824-xsa4`
-- Status: `TODO`
+- Status: `BLOCKED`
 - Owner: `main-agent`
 - Branch: `codex/pr824-xsa4`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/pr824-xsa4`
@@ -20,4 +20,9 @@
 
 ## Next step
 
-- Run it in the `pr824-exploit` confirm wave.
+- This branch is currently misconfigured.
+  - During `pr824_exploit_20260402`, the trainer log printed `xsa_last_n:6`, so it was not testing the intended `XSA_LAST_N=4` ablation.
+  - The run was manually killed.
+- Required fix before rerun:
+  - change the branch trainer default to `XSA_LAST_N=4` or update the runner to pass `XSA_LAST_N=4` explicitly.
+  - rerun this branch only after the fix is confirmed in the startup logs.
