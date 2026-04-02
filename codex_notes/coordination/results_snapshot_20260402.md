@@ -127,9 +127,18 @@ Hyperconnection-lite:
 - `step_avg: 301.77ms`
 - `serialized_model_int8_zlib: 15129316 bytes`
 
+KGIIR-lite:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite/logs/explore_lite_20260402_kgiir_lite.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.67562160`
+- `delta vs fresh baseline: -0.01677831`
+- `step_avg: 318.83ms`
+- `serialized_model_int8_zlib: 15173162 bytes`
+
 Interpretation:
 
 - this baseline is close to the historical confirm baseline (`-0.00039599` better than `1.69279590`)
 - use this fresh baseline, not the `pr824-exploit` baseline, for `attnres_lite`, `hyperconnection_lite`, and `kgiir_lite`
 - `attnres_lite` is a modest but real local win and stays under the 16MB artifact cap, so this residual-routing family deserves one follow-up stack on top of `PR824` or `value-residual-only`
 - `hyperconnection_lite` is a clear local miss at this initialization/topology, so drop it for now and keep the residual-routing explore budget on AttnRes-style variants instead
+- `kgiir_lite` is a stronger explore win than `attnres_lite` at a manageable speed cost, so the next obvious exploit branch is `PR824/value-residual + KGIIR-lite`

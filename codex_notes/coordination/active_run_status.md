@@ -1,14 +1,14 @@
 # Active Run Status
 
-Last updated: 2026-04-02 14:01 BST
+Last updated: 2026-04-02 14:20 BST
 
 ## Current local execution
 
-- Active wave: `explore-lite`
+- Active wave: `next-frontier-lite`
 - Profile: `confirm`
-- Run id: `explore_lite_20260402`
-- Current session: `20353`
-- Current experiment: `kgiir_lite`
+- Run id: `next_frontier_lite_20260402`
+- Current session: `1044`
+- Current experiment: `baseline`
 
 ## Completed reference waves
 
@@ -90,6 +90,12 @@ Last updated: 2026-04-02 14:01 BST
   - `serialized_model_int8_zlib: 15129316 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/hyperconnection-lite/logs/explore_lite_20260402_hyperconnection_lite.txt`
   - interpretation: clear local regression versus fresh baseline (`+0.01027429`), so this branch is a drop unless a materially different initialization/topology is tried later
+- `explore_lite_20260402` kgiir-lite:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67562160`
+  - `step_avg: 318.83ms`
+  - `serialized_model_int8_zlib: 15173162 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite/logs/explore_lite_20260402_kgiir_lite.txt`
+  - interpretation: stronger local win than `attnres_lite` (`-0.01677831` vs fresh baseline), so this branch deserves one `PR824/value-residual + KGIIR-lite` stack test
 
 ## Automatic follow-on
 

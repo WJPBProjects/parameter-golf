@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `kgiir-lite`
-- Status: `IN_PROGRESS:main-agent`
+- Status: `PASS`
 - Owner: `main-agent`
 - Branch: `codex/kgiir-lite`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite`
@@ -20,5 +20,17 @@
 
 ## Next step
 
-- Currently running in `explore_lite_20260402`.
-- Compare final post-quant BPB against fresh baseline `1.69239991` from `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`.
+- Completed in `explore_lite_20260402`.
+- Fresh wave baseline:
+  - `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69239991`
+- Result:
+  - `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite/logs/explore_lite_20260402_kgiir_lite.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67562160`
+  - `delta vs fresh baseline: -0.01677831`
+  - `step_avg: 318.83ms`
+  - `serialized_model_int8_zlib: 15173162 bytes`
+- Interpretation:
+  - this is a strong local win for a lightweight temporal pre-attention mixer
+  - the effect is weaker than `PR824 mimic` but clearly larger than `AttnRes-lite`
+  - likely next branch: stack KGIIR-lite onto `PR824` or `value-residual-only` rather than continue this branch in isolation
