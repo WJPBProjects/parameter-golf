@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 11:18 BST
+Last updated: 2026-04-02 11:35 BST
 
 ## Current local execution
 
@@ -50,6 +50,8 @@ Last updated: 2026-04-02 11:18 BST
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
 - Waiting session: `20353`
   - runs `explore_lite_20260402` after `pr824_exploit_20260402_summary.txt` appears
+- Waiting session: `1044`
+  - runs `next_frontier_lite_20260402` after `explore_lite_20260402_summary.txt` appears
 
 ## Parallel research lane
 

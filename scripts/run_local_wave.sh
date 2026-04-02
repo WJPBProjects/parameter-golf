@@ -33,7 +33,7 @@ case "$profile" in
     ;;
   *)
     echo "Unknown profile: $profile" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac
@@ -231,6 +231,24 @@ run_attnres_lite() {
     bash "$wrapper"
 }
 
+run_pr824_value_embedding_lite() {
+  run_case "pr824_value_embedding_lite" "$WORKTREES_ROOT/pr824-value-embedding-lite" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-value-embedding-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_pr824_parallel_residuals() {
+  run_case "pr824_parallel_residuals" "$WORKTREES_ROOT/pr824-parallel-residuals" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-parallel-residuals/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
+run_mohd_lastmlp_lite() {
+  run_case "mohd_lastmlp_lite" "$WORKTREES_ROOT/mohd-lastmlp-lite" \
+    TRAIN_MLX_SCRIPT=experiments/mohd-lastmlp-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -285,9 +303,15 @@ case "$wave" in
     run_hyperconnection_lite
     run_kgiir_lite
     ;;
+  next-frontier-lite)
+    run_baseline
+    run_pr824_value_embedding_lite
+    run_pr824_parallel_residuals
+    run_mohd_lastmlp_lite
+    ;;
   *)
     echo "Unknown wave: $wave" >&2
-    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite] [screen|confirm|overnight]" >&2
+    echo "Usage: $0 [rerun-all|rerun-tail|winner-focus|latest-pr-signal|latest-pr-tail|pr824-exploit|explore-lite|next-frontier-lite] [screen|confirm|overnight]" >&2
     exit 1
     ;;
 esac

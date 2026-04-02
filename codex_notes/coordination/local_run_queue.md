@@ -104,6 +104,22 @@ That wave runs:
 3. `hyperconnection-lite`
 4. `kgiir-lite`
 
+## Next-frontier-lite wave
+
+Once `pr824-exploit` and `explore-lite` complete, the next prepared queue is:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh next-frontier-lite confirm
+```
+
+That wave should run:
+
+1. baseline
+2. `PR824 + value-embedding-lite`
+3. `PR824 + ParallelResiduals`
+4. `MoHD last-MLP lite`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:
