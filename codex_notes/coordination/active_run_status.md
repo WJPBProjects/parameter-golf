@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 13:04 BST
+Last updated: 2026-04-02 13:18 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 13:04 BST
 - Profile: `confirm`
 - Run id: `explore_lite_20260402`
 - Current session: `20353`
-- Current experiment: `baseline`
+- Current experiment: `attnres_lite`
 
 ## Completed reference waves
 
@@ -73,6 +73,11 @@ Last updated: 2026-04-02 13:04 BST
   - `pr824_qkgain5` exited `143` after manual stop because the branch trainer was only standalone `QK_GAIN=5.0`, not PR824 + QK gain
   - `pr824_xsa4` exited `143` after manual stop because the branch trainer still logged `xsa_last_n:6`, not `4`
   - both branches have now been repaired by dedicated workers and are queued for a fresh `pr824-fixups` wave
+- `explore_lite_20260402` baseline:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69239991`
+  - `step_avg: 303.23ms`
+  - `serialized_model_int8_zlib: 15128268 bytes`
+  - log: `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`
 
 ## Automatic follow-on
 

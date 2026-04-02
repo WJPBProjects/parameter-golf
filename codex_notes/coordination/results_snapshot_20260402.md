@@ -101,3 +101,17 @@ Interpretation:
 - `value_residual_only` keeps almost all of the full PR824 gain, so the value path is very likely the dominant mechanism and attention gating should be treated as an incremental add-on unless the next ablation contradicts that
 - `attn_gate_only` is still helpful, but materially weaker than `value_residual_only`; the clean working theory now is "value residual is the main lever, attention gate is a smaller stackable gain"
 - `pr824_qkgain5` and `pr824_xsa4` were manually stopped because their branch configs did not match the intended experiment definitions, so they should be ignored until repaired
+
+## Active `explore-lite` wave
+
+Fresh wave baseline:
+
+- `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69239991`
+- `step_avg: 303.23ms`
+- `serialized_model_int8_zlib: 15128268 bytes`
+
+Interpretation:
+
+- this baseline is close to the historical confirm baseline (`-0.00039599` better than `1.69279590`)
+- use this fresh baseline, not the `pr824-exploit` baseline, for `attnres_lite`, `hyperconnection_lite`, and `kgiir_lite`

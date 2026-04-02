@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `attnres-lite`
-- Status: `TODO`
+- Status: `IN_PROGRESS:main-agent`
 - Owner: `main-agent`
 - Branch: `codex/attnres-lite`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite`
@@ -20,4 +20,5 @@
 
 ## Next step
 
-- Run in `explore-lite` after the exploit wave.
+- Currently running in `explore_lite_20260402`.
+- Compare final post-quant BPB against fresh baseline `1.69239991` from `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`.
