@@ -57,3 +57,17 @@ Latest-PR signal wave:
   - `pr824_exploit_20260402`
 - queued after `pr824_exploit_20260402_summary.txt` appears:
   - `explore_lite_20260402`
+
+## Active `pr824-exploit` wave
+
+Fresh wave baseline:
+
+- `/Users/wulfie/code/parameter-golf/logs/pr824_exploit_20260402_baseline.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69601453`
+- `step_avg: 323.76ms`
+- `serialized_model_int8_zlib: 15128342 bytes`
+
+Interpretation:
+
+- this baseline is `+0.00321863` worse than the earlier `rerun_wave_20260401` confirm baseline
+- that amount of drift is small enough that the wave is still usable, but borderline deltas in the `0.003` range should be treated carefully

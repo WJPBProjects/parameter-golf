@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 11:35 BST
+Last updated: 2026-04-02 11:52 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 11:35 BST
 - Profile: `confirm`
 - Run id: `pr824_exploit_20260402`
 - Current session: `67770`
-- Current experiment: `baseline`
+- Current experiment: `pr824_mimic`
 
 ## Completed reference waves
 
@@ -43,6 +43,11 @@ Last updated: 2026-04-02 11:35 BST
   - `serialized_model_int8_zlib: 22204302 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/wd085-mlp4-pr1218/logs/wd085_mlp4_pr1218_confirm_20260402.txt`
   - current interpretation: local quality is flat, speed is worse, and the artifact exceeds the 16MB cap, so this branch is a reject unless a much smaller `MLP_MULT` / compression variant is tried
+- `pr824_exploit_20260402` baseline:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69601453`
+  - `step_avg: 323.76ms`
+  - `serialized_model_int8_zlib: 15128342 bytes`
+  - log: `/Users/wulfie/code/parameter-golf/logs/pr824_exploit_20260402_baseline.txt`
 
 ## Automatic follow-on
 
