@@ -198,6 +198,24 @@ That wave runs:
 4. `PR824 + QK_GAIN=5.0`
 5. `PR824 + QK_GAIN=6.0`
 
+## Next exploit frontier wave
+
+After the qk-gain neighborhood sweep, run the two fresh branches prepared from the
+2026-04-02 value-path research memo:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh next-exploit-frontier confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `PR824` mimic
+3. `PR824 + QK_GAIN=5.0`
+4. `PR824 + QK_GAIN=5.0 + KGIIR-lite`
+5. `PR824 + Softpick-lite`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:
