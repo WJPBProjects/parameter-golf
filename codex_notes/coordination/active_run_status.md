@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 13:40 BST
+Last updated: 2026-04-02 14:01 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 13:40 BST
 - Profile: `confirm`
 - Run id: `explore_lite_20260402`
 - Current session: `20353`
-- Current experiment: `hyperconnection_lite`
+- Current experiment: `kgiir_lite`
 
 ## Completed reference waves
 
@@ -84,6 +84,12 @@ Last updated: 2026-04-02 13:40 BST
   - `serialized_model_int8_zlib: 15311780 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/attnres-lite/logs/explore_lite_20260402_attnres_lite.txt`
   - interpretation: a real but modest win (`-0.00738552` vs fresh baseline) at about `+3.9%` step-time cost, so this is a secondary positive explore direction
+- `explore_lite_20260402` hyperconnection-lite:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.70267420`
+  - `step_avg: 301.77ms`
+  - `serialized_model_int8_zlib: 15129316 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/hyperconnection-lite/logs/explore_lite_20260402_hyperconnection_lite.txt`
+  - interpretation: clear local regression versus fresh baseline (`+0.01027429`), so this branch is a drop unless a materially different initialization/topology is tried later
 
 ## Automatic follow-on
 

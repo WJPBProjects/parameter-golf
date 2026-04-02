@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `hyperconnection-lite`
-- Status: `IN_PROGRESS:main-agent`
+- Status: `FAIL`
 - Owner: `main-agent`
 - Branch: `codex/hyperconnection-lite`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/hyperconnection-lite`
@@ -20,5 +20,12 @@
 
 ## Next step
 
-- Currently running in `explore_lite_20260402`.
-- Compare final post-quant BPB against fresh baseline `1.69239991` from `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`.
+- Result from `explore_lite_20260402`:
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/hyperconnection-lite/logs/explore_lite_20260402_hyperconnection_lite.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.70267420`
+  - fresh baseline: `1.69239991`
+  - `step_avg: 301.77ms`
+  - `serialized_model_int8_zlib: 15129316 bytes`
+- Interpretation:
+  - Clear local regression at this topology/init.
+  - Drop this branch for now; if Hyper-Connections is revisited, it likely needs a different residual split or a PR824/value-path stack rather than this standalone form.

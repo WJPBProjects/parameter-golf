@@ -1,7 +1,7 @@
 # Experiment
 
 - Name: `kgiir-lite`
-- Status: `TODO`
+- Status: `IN_PROGRESS:main-agent`
 - Owner: `main-agent`
 - Branch: `codex/kgiir-lite`
 - Worktree: `/Users/wulfie/code/parameter-golf-worktrees/kgiir-lite`
@@ -20,4 +20,5 @@
 
 ## Next step
 
-- Run it after the current exploit wave unless a stronger explore candidate displaces it.
+- Currently running in `explore_lite_20260402`.
+- Compare final post-quant BPB against fresh baseline `1.69239991` from `/Users/wulfie/code/parameter-golf/logs/explore_lite_20260402_baseline.txt`.
