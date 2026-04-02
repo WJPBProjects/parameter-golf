@@ -184,7 +184,7 @@ Interpretation:
 
 - quality is basically baseline to slightly worse, so this MoHD-style tail-channel gate is not worth another local slot unless we redesign the gate form or combine it with the value-residual family differently
 
-## Active `pr824-fixups` wave
+## Completed `pr824-fixups` wave
 
 Fresh wave baseline:
 
@@ -192,10 +192,6 @@ Fresh wave baseline:
 - `final_int8_zlib_roundtrip_exact val_bpb: 1.69615068`
 - `step_avg: 310.25ms`
 - `serialized_model_int8_zlib: 15136050 bytes`
-
-Currently running:
-
-- `pr824_xsa4`
 
 PR824 mimic positive control:
 
@@ -217,3 +213,28 @@ PR824 + QK_GAIN=5.0:
 Interpretation:
 
 - this is the best local result so far and the first QK-gain variant with a clear positive signal when stacked on the PR824 value/gate core
+
+PR824 with XSA last 4:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-xsa4/logs/pr824_fixups_20260402_pr824_xsa4.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.66929723`
+- `delta vs fresh baseline: -0.02685345`
+- `delta vs PR824 mimic: +0.00096004`
+- `step_avg: 327.47ms`
+- `serialized_model_int8_zlib: 15330969 bytes`
+
+Interpretation:
+
+- `XSA_LAST_N=4` is still a clear win over the baseline and slightly faster/smaller than the full PR824 mimic branch, but the quality drop relative to XSA6 is large enough that this is an ablation result, not the current best exploit path
+
+## Active `pr824-stacks` wave
+
+Currently running:
+
+- `baseline`
+
+Queued in this wave:
+
+- `pr824_mimic`
+- `pr824_kgiir_lite`
+- `pr824_attnres_lite`

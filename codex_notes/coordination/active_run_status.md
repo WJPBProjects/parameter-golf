@@ -1,14 +1,14 @@
 # Active Run Status
 
-Last updated: 2026-04-02 17:08 BST
+Last updated: 2026-04-02 17:24 BST
 
 ## Current local execution
 
-- Active wave: `pr824-fixups`
+- Active wave: `pr824-stacks`
 - Profile: `confirm`
-- Run id: `pr824_fixups_20260402`
-- Current session: `14285`
-- Current experiment: `pr824_xsa4`
+- Run id: `pr824_stacks_20260402`
+- Current session: `34638`
+- Current experiment: `baseline`
 
 ## Completed reference waves
 
@@ -135,6 +135,12 @@ Last updated: 2026-04-02 17:08 BST
   - `serialized_model_int8_zlib: 15403892 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-qkgain5/logs/pr824_fixups_20260402_pr824_qkgain5.txt`
   - interpretation: new best local result so far (`-0.00642726` vs fresh PR824 mimic and `-0.03424075` vs baseline), so this branch should be treated as the current exploit target
+- `pr824_fixups_20260402` PR824 with XSA last 4:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66929723`
+  - `step_avg: 327.47ms`
+  - `serialized_model_int8_zlib: 15330969 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-xsa4/logs/pr824_fixups_20260402_pr824_xsa4.txt`
+  - interpretation: beats the fresh fixup baseline, but is slightly worse than PR824 mimic and clearly behind `pr824-qkgain5`, so keep this as an ablation result rather than a new exploit branch
 
 ## Automatic follow-on
 
@@ -142,10 +148,8 @@ Last updated: 2026-04-02 17:08 BST
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
 - Waiting session: `1044`
   - completed `next_frontier_lite_20260402`; summary at `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_summary.txt`
-- Waiting session: `14285`
-  - currently running `pr824_fixups_20260402`
 - Waiting session: `34638`
-  - runs `pr824_stacks_20260402` after `pr824_fixups_20260402_summary.txt` appears
+  - currently running `pr824_stacks_20260402`
 - Waiting session: `60192`
   - runs `pr824_explore2_20260402` after `pr824_stacks_20260402_summary.txt` appears
 - Waiting session: `45526`
