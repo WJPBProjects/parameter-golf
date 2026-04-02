@@ -279,6 +279,12 @@ run_pr824_no_xsa() {
     bash "$wrapper"
 }
 
+run_pr824_valres_init020() {
+  run_case "pr824_valres_init020" "$WORKTREES_ROOT/pr824-valres-init020" \
+    TRAIN_MLX_SCRIPT=experiments/pr824-valres-init020/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -355,6 +361,7 @@ case "$wave" in
     run_baseline
     run_pr824_mimic
     run_pr824_no_xsa
+    run_pr824_valres_init020
     run_pr824_soft_xsa
     run_pr824_diffattn_lite
     ;;

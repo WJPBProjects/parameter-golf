@@ -168,8 +168,9 @@ That wave runs:
 1. baseline
 2. `PR824` mimic
 3. `PR824` no XSA
-4. `PR824 + soft XSA`
-5. `PR824 + DiffAttn-lite`
+4. `PR824` value residual init `0.20`
+5. `PR824 + soft XSA`
+6. `PR824 + DiffAttn-lite`
 
 ## Dataset note for longer local runs
 
