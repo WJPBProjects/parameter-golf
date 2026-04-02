@@ -154,7 +154,7 @@ Fresh wave baseline:
 
 Currently running:
 
-- `pr824_parallel_residuals`
+- `mohd_lastmlp_lite`
 
 First value-embedding attempt:
 
@@ -162,3 +162,16 @@ First value-embedding attempt:
 - pre-quant `step:4000/4000 val_bpb: 1.6884`
 - run exited `1` during `mx.savez` with `RuntimeError: std::bad_cast`
 - branch-local fix is prepared; do not score this branch until a clean post-quant rerun lands
+
+PR824 + ParallelResiduals:
+
+- `/Users/wulfie/code/parameter-golf-worktrees/pr824-parallel-residuals/logs/next_frontier_lite_20260402_pr824_parallel_residuals.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.67725281`
+- `delta vs fresh baseline: -0.01848765`
+- `step_avg: 328.92ms`
+- `serialized_model_int8_zlib: 15300798 bytes`
+
+Interpretation:
+
+- this branch is clearly better than the fresh `next-frontier-lite` baseline
+- but it is not better than the PR824 mimic positive control from nearby waves, so ParallelResiduals still looks like a standalone win that does not obviously stack on top of the PR824 value/gate core

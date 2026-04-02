@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 15:24 BST
+Last updated: 2026-04-02 15:38 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 15:24 BST
 - Profile: `confirm`
 - Run id: `next_frontier_lite_20260402`
 - Current session: `1044`
-- Current experiment: `pr824_parallel_residuals`
+- Current experiment: `mohd_lastmlp_lite`
 
 ## Completed reference waves
 
@@ -106,6 +106,12 @@ Last updated: 2026-04-02 15:24 BST
   - run exited `1` at `mx.savez(...flat_state)` with `RuntimeError: std::bad_cast`
   - stderr: `/Users/wulfie/code/parameter-golf/logs/next_frontier_lite_20260402_pr824_value_embedding_lite.stderr.txt`
   - root cause: non-array Python metadata leaves in `model.state`; branch-local fix is prepared and this experiment needs a clean rerun
+- `next_frontier_lite_20260402` PR824 + ParallelResiduals:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67725281`
+  - `step_avg: 328.92ms`
+  - `serialized_model_int8_zlib: 15300798 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-parallel-residuals/logs/next_frontier_lite_20260402_pr824_parallel_residuals.txt`
+  - interpretation: real local win versus this wave's baseline (`-0.01848765`), but still weaker than plain `PR824 mimic`, so this is not yet evidence of positive composition
 
 ## Automatic follow-on
 
