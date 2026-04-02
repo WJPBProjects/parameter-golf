@@ -88,6 +88,22 @@ That wave runs:
 5. `PR824 + QK_GAIN=5.0`
 6. `PR824` with `XSA_LAST_N=4`
 
+## Explore-lite wave
+
+After the exploit wave, use this small literature-backed explore batch:
+
+```bash
+cd /Users/wulfie/code/parameter-golf
+CONTINUE_ON_ERROR=1 bash scripts/run_local_wave.sh explore-lite confirm
+```
+
+That wave runs:
+
+1. baseline
+2. `attnres-lite`
+3. `hyperconnection-lite`
+4. `kgiir-lite`
+
 ## Dataset note for longer local runs
 
 The current laptop setup uses `10` train shards. That is fine for quick screening, but for longer local-only runs it is reasonable to expand the local subset first:

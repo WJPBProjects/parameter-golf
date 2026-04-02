@@ -1,14 +1,14 @@
 # Active Run Status
 
-Last updated: 2026-04-02 00:50 BST
+Last updated: 2026-04-02 11:18 BST
 
 ## Current local execution
 
-- Active wave: `latest-pr-tail`
+- Active wave: `pr824-exploit`
 - Profile: `confirm`
-- Run tag: `latest_pr_tail_20260402`
-- Session: `86084`
-- Current experiment: `pr824_mimic`
+- Run id: `pr824_exploit_20260402`
+- Current session: `67770`
+- Current experiment: `baseline`
 
 ## Completed reference waves
 
@@ -24,21 +24,32 @@ Last updated: 2026-04-02 00:50 BST
 - `gptq_calib_validation`
   - `final_int8_zlib_roundtrip_exact val_bpb: 1.69487012`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/gptq-self-calibration/logs/rerun_tail_20260401_gptq_calib_validation.txt`
+- `latest_pr_tail` positive control:
+  - `pr824_mimic`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66856748`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/latest_pr_tail_20260402_pr824_mimic.txt`
+- `latest_pr_tail` standalone QK-gain probe:
+  - `qkgain5_pr1217`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.70448780`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/qkgain5-pr1217/logs/latest_pr_tail_20260402_qkgain5_pr1217.txt`
+- `latest_pr_tail` partial parallel residuals probe:
+  - `parallel_residuals_pr1204`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67852834`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/parallel-residuals-pr1204/logs/latest_pr_tail_20260402_parallel_residuals_pr1204.txt`
+- standalone partial `PR1218`:
+  - `wd085_mlp4_pr1218_confirm_20260402`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69335416`
+  - `step_avg: 390.16ms`
+  - `serialized_model_int8_zlib: 22204302 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/wd085-mlp4-pr1218/logs/wd085_mlp4_pr1218_confirm_20260402.txt`
+  - current interpretation: local quality is flat, speed is worse, and the artifact exceeds the 16MB cap, so this branch is a reject unless a much smaller `MLP_MULT` / compression variant is tried
 
 ## Automatic follow-on
 
-- Current active wave:
-  - `latest_pr_tail_20260402`
-  - runs:
-    - `pr824_mimic`
-    - `qkgain5_pr1217`
-    - `parallel_residuals_pr1204`
-- Waiting session: `70197`
-  - runs partial `PR1218` port after `latest_pr_tail_20260402_summary.txt` appears
-  - run id:
-    - `wd085_mlp4_pr1218_confirm_20260402`
-- Waiting session: `82535`
-  - runs `pr824_exploit_20260402` after the partial `PR1218` run finishes
+- `latest_pr_tail_20260402` is complete and summarized in:
+  - `/Users/wulfie/code/parameter-golf/logs/latest_pr_tail_20260402_summary.txt`
+- Waiting session: `20353`
+  - runs `explore_lite_20260402` after `pr824_exploit_20260402_summary.txt` appears
 
 ## Parallel research lane
 

@@ -225,6 +225,12 @@ run_kgiir_lite() {
     bash "$wrapper"
 }
 
+run_attnres_lite() {
+  run_case "attnres_lite" "$WORKTREES_ROOT/attnres-lite" \
+    TRAIN_MLX_SCRIPT=experiments/attnres-lite/train_gpt_mlx.py \
+    bash "$wrapper"
+}
+
 case "$wave" in
   rerun-all)
     run_baseline
@@ -275,6 +281,7 @@ case "$wave" in
     ;;
   explore-lite)
     run_baseline
+    run_attnres_lite
     run_hyperconnection_lite
     run_kgiir_lite
     ;;

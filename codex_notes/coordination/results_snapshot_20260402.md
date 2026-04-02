@@ -35,9 +35,25 @@ Latest-PR signal wave:
 - baseline completed:
   - `/Users/wulfie/code/parameter-golf/logs/latest_pr_signal_20260401_baseline.txt`
   - `final_int8_zlib_roundtrip_exact val_bpb: 1.69780921`
-- `pr824_mimic` rerun is currently active
-- queued after that:
-  - `qkgain5_pr1217`
-  - `parallel_residuals_pr1204`
-- queued after the latest-PR summary appears:
-  - partial `PR1218` mimic with `MLP_MULT=4`
+- restarted tail-wave positive control completed:
+  - `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid/logs/latest_pr_tail_20260402_pr824_mimic.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66856748`
+  - this closely matches the earlier `1.67002607` result, which is strong evidence that the local confirm harness is directionally trustworthy
+- `qkgain5_pr1217` completed:
+  - `/Users/wulfie/code/parameter-golf-worktrees/qkgain5-pr1217/logs/latest_pr_tail_20260402_qkgain5_pr1217.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.70448780`
+  - local miss versus the latest-PR baseline `1.69780921`
+- `parallel_residuals_pr1204` completed:
+  - `/Users/wulfie/code/parameter-golf-worktrees/parallel-residuals-pr1204/logs/latest_pr_tail_20260402_parallel_residuals_pr1204.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.67852834`
+  - local win versus baseline, but still clearly weaker than `PR824 mimic`
+- `wd085_mlp4_pr1218_confirm_20260402` completed:
+  - `/Users/wulfie/code/parameter-golf-worktrees/wd085-mlp4-pr1218/logs/wd085_mlp4_pr1218_confirm_20260402.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69335416`
+  - `step_avg: 390.16ms`
+  - `serialized_model_int8_zlib: 22204302 bytes`
+  - local quality is basically flat versus baseline, but the branch is much slower and the artifact is far above the 16MB cap, so this partial `MLP_MULT=4` port is not a viable direction in its current form
+- currently active:
+  - `pr824_exploit_20260402`
+- queued after `pr824_exploit_20260402_summary.txt` appears:
+  - `explore_lite_20260402`
