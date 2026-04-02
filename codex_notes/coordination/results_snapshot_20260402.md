@@ -229,9 +229,16 @@ Interpretation:
 
 ## Active `pr824-stacks` wave
 
+Fresh wave baseline:
+
+- `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_baseline.txt`
+- `final_int8_zlib_roundtrip_exact val_bpb: 1.69449315`
+- `step_avg: 340.85ms`
+- `serialized_model_int8_zlib: 15135923 bytes`
+
 Currently running:
 
-- `baseline`
+- `pr824_mimic`
 
 Queued in this wave:
 

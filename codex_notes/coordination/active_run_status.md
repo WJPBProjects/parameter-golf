@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 17:24 BST
+Last updated: 2026-04-02 17:50 BST
 
 ## Current local execution
 
@@ -8,7 +8,7 @@ Last updated: 2026-04-02 17:24 BST
 - Profile: `confirm`
 - Run id: `pr824_stacks_20260402`
 - Current session: `34638`
-- Current experiment: `baseline`
+- Current experiment: `pr824_mimic`
 
 ## Completed reference waves
 
@@ -141,6 +141,12 @@ Last updated: 2026-04-02 17:24 BST
   - `serialized_model_int8_zlib: 15330969 bytes`
   - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-xsa4/logs/pr824_fixups_20260402_pr824_xsa4.txt`
   - interpretation: beats the fresh fixup baseline, but is slightly worse than PR824 mimic and clearly behind `pr824-qkgain5`, so keep this as an ablation result rather than a new exploit branch
+- `pr824_stacks_20260402` baseline:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.69449315`
+  - `step_avg: 340.85ms`
+  - `serialized_model_int8_zlib: 15135923 bytes`
+  - log: `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_baseline.txt`
+  - interpretation: use this baseline as the reference for `pr824_kgiir_lite` and `pr824_attnres_lite` in the current stack wave
 
 ## Automatic follow-on
 
