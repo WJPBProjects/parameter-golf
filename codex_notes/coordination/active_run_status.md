@@ -160,9 +160,11 @@ Last updated: 2026-04-02 17:24 BST
 ## Parallel research lane
 
 - Research sub-agents can run in parallel with the local MLX queue because they do not need the Apple GPU.
-- Current themes in flight:
-  - recent literature on compact / efficient LM ideas
-  - latest public PR frontier mining
+- Latest sidecars completed and were consolidated into:
+  - `codex_notes/planning/value_path_frontier_memo_20260402.md`
+- Current recommendation from that memo:
+  - keep exploiting the PR824 value/gate/QK/KGIIR family locally
+  - prepare `Softpick-lite`, token-wise residual-gate, and tiny-memory-slot branches only if the current queued waves stall
 
 ## Key reference benchmark
 
