@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-02 18:48 BST
+Last updated: 2026-04-02 19:21 BST
 
 ## Current local execution
 
@@ -13,7 +13,7 @@ Last updated: 2026-04-02 18:48 BST
 ## Pause reason
 
 - User asked to pause after the next run finished and summarize.
-- `pr824_kgiir_lite` completed, `pr824_attnres_lite` failed at startup, and all queued `run_local_wave.sh` / `train_gpt_mlx.py` processes were terminated.
+- `pr824_kgiir_lite` completed, `pr824_attnres_lite` was fixed branch-locally and rerun manually, and all `run_local_wave.sh` / `train_gpt_mlx.py` processes are now stopped.
 
 ## Completed reference waves
 
@@ -168,6 +168,12 @@ Last updated: 2026-04-02 18:48 BST
   - failed immediately with `TypeError: GPT.__init__() got an unexpected keyword argument 'attnres_enable'`
   - stderr: `/Users/wulfie/code/parameter-golf/logs/pr824_stacks_20260402_pr824_attnres_lite.stderr.txt`
   - interpretation: this is a branch plumbing bug, not evidence against the idea itself
+- `pr824_attnres_lite_fix_confirm` manual rerun after branch-local constructor fix:
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66903305`
+  - `step_avg: 299.56ms`
+  - `serialized_model_int8_zlib: 15366274 bytes`
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/pr824-attnres-lite/logs/pr824_attnres_lite_fix_confirm.txt`
+  - interpretation: the AttnRes stack is a real win over the baseline and noticeably faster than PR824 mimic, but quality is still slightly worse than PR824 mimic and well behind `pr824-kgiir-lite`
 
 ## Automatic follow-on
 

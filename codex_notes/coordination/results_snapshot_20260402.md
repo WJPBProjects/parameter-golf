@@ -269,6 +269,22 @@ Interpretation:
 
 - this branch is currently blocked by a constructor/plumbing bug, so the failed run should not be interpreted as a quality result
 
+## Manual `pr824-attnres-lite` fix rerun
+
+- Constructor bug was fixed in the branch-local trainer and validated with a 1-step smoke run.
+- Manual confirm rerun:
+  - `/Users/wulfie/code/parameter-golf-worktrees/pr824-attnres-lite/logs/pr824_attnres_lite_fix_confirm.txt`
+  - `final_int8_zlib_roundtrip_exact val_bpb: 1.66903305`
+  - `delta vs pr824_stacks_20260402 baseline: -0.02546010`
+  - `delta vs pr824_stacks_20260402 PR824 mimic: +0.00132329`
+  - `delta vs pr824_stacks_20260402 PR824 + KGIIR-lite: +0.00955914`
+  - `step_avg: 299.56ms`
+  - `serialized_model_int8_zlib: 15366274 bytes`
+
+Interpretation:
+
+- AttnRes-lite does stack into a strong local model, but not better than PR824 mimic on quality and clearly not better than PR824 + KGIIR-lite. The main reason to keep it around is the unusually good speed/quality tradeoff.
+
 Queued in this wave:
 
 - `pr824_mimic`
