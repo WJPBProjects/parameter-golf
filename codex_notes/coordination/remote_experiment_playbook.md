@@ -49,6 +49,10 @@ Current scripts:
   - `scripts/pull_remote_run_artifacts.sh`
 - local helper to drive a stage-3 baseline/control/candidate sequence over SSH:
   - `scripts/run_remote_validation_sequence.sh`
+- automatic validation-pod claim helper with local locks:
+  - `scripts/claim_remote_validation_pod.sh`
+- automatic validation-pod release helper:
+  - `scripts/release_remote_validation_pod.sh`
 - true `8xH100` submission-style run:
   - `scripts/run_remote_submission_8xh100.sh`
 - helper to create the `8xH100` RunPod:
@@ -140,6 +144,8 @@ ssh runpod-pg-a
 
 Do not paste private keys or API tokens into repo notes or chat.
 
+If `runpodctl ssh info <pod-id>` is working, the local queue helper can now avoid a manual alias entirely by using `auto` mode.
+
 ## Standard runner
 
 Use the wrapper script so remote runs produce a consistent `RUN_ID`, metadata file, and summary file:
@@ -180,7 +186,7 @@ For the common same-pod baseline/control/candidate sequence from the local machi
 
 ```bash
 bash scripts/run_remote_validation_sequence.sh \
-  runpod-pg-a \
+  auto \
   pr824-kgiir-lite \
   codex/pr824-kgiir-lite \
   experiments/pr824-kgiir-lite/train_gpt.py
@@ -189,9 +195,42 @@ bash scripts/run_remote_validation_sequence.sh \
 This local helper:
 
 - optionally pushes `main`, the PR824 positive-control branch, and the candidate branch to `origin`
+- claims a stopped validation pod using a local lock under `codex_notes/coordination_live/remote_pod_claims/`
+- starts that pod with `runpodctl`
+- resolves the live SSH endpoint via `runpodctl ssh info`
 - bootstraps the pod repo and dataset if needed
 - runs baseline, control, and candidate in order
 - pulls logs and artifacts back under `remote_results/`
+- stops and releases the pod by default when the sequence exits
+
+## Validation-pod guard rails
+
+The normal stage-3 validation flow is now:
+
+1. claim a validation pod with `scripts/claim_remote_validation_pod.sh`
+2. only claim pods whose RunPod status is `EXITED`
+3. never reuse a pod that is already running but not locally claimed
+4. after the run, stop and release it with `scripts/release_remote_validation_pod.sh`
+
+This means:
+
+- up to `3` validation jobs can run in parallel
+- each should occupy a different pod
+- a running pod is treated as busy, even if it lacks a local lock, to avoid stepping on work started elsewhere
+
+If you want a manual claim without immediately running a sequence:
+
+```bash
+bash scripts/claim_remote_validation_pod.sh main-agent
+```
+
+That returns JSON including:
+
+- `id`
+- `name`
+- `ssh_command`
+- `ip`
+- `port`
 
 ## True remote submission runner
 

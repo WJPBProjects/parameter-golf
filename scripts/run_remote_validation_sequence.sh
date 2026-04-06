@@ -5,9 +5,15 @@ set -euo pipefail
 if [[ $# -lt 4 ]]; then
   cat <<'EOF'
 Usage:
-  bash scripts/run_remote_validation_sequence.sh <ssh-target> <candidate-slug> <candidate-branch> <candidate-train-script>
+  bash scripts/run_remote_validation_sequence.sh <ssh-target|auto> <candidate-slug> <candidate-branch> <candidate-train-script>
 
 Examples:
+  bash scripts/run_remote_validation_sequence.sh \
+    auto \
+    pr824-kgiir-lite \
+    codex/pr824-kgiir-lite \
+    experiments/pr824-kgiir-lite/train_gpt.py
+
   bash scripts/run_remote_validation_sequence.sh \
     runpod-pg-a \
     pr824-kgiir-lite \
@@ -28,12 +34,18 @@ CANDIDATE_SCRIPT="$4"
 REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/workspace/parameter-golf}"
 REPO_REMOTE_URL="${REPO_REMOTE_URL:-$(git remote get-url origin)}"
 SSH_OPTS="${SSH_OPTS:-}"
+SSH_PORT="${SSH_PORT:-}"
 PUSH_BRANCHES="${PUSH_BRANCHES:-1}"
 PULL_AFTER_EACH="${PULL_AFTER_EACH:-1}"
 BOOTSTRAP_DATA="${BOOTSTRAP_DATA:-1}"
 LOCAL_RESULTS_ROOT="${LOCAL_RESULTS_ROOT:-$ROOT/remote_results}"
 STAMP="${STAMP:-$(date +%Y%m%d_%H%M%S)}"
 RESULT_DIR="${LOCAL_RESULTS_ROOT}/${STAMP}_${CANDIDATE_SLUG}"
+AUTO_RELEASE_POD="${AUTO_RELEASE_POD:-1}"
+OWNER_LABEL="${OWNER_LABEL:-main-agent}"
+
+AUTO_CLAIMED_POD_ID=""
+AUTO_SSH_INFO_JSON=""
 
 CONTROL_SLUG="${CONTROL_SLUG:-pr824-mimic}"
 CONTROL_BRANCH="${CONTROL_BRANCH:-codex/pr824-mimic-gatedattn-valueresid}"
@@ -48,6 +60,31 @@ CANDIDATE_ENV="${CANDIDATE_ENV:-}"
 
 mkdir -p "$RESULT_DIR"
 
+ssh_cmd() {
+  if [[ -n "$SSH_PORT" ]]; then
+    # shellcheck disable=SC2086
+    ssh $SSH_OPTS -p "$SSH_PORT" "$@"
+  else
+    # shellcheck disable=SC2086
+    ssh $SSH_OPTS "$@"
+  fi
+}
+
+cleanup() {
+  if [[ -n "$AUTO_CLAIMED_POD_ID" && "$AUTO_RELEASE_POD" == "1" ]]; then
+    bash scripts/release_remote_validation_pod.sh "$AUTO_CLAIMED_POD_ID" >/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+if [[ "$SSH_TARGET" == "auto" ]]; then
+  AUTO_SSH_INFO_JSON="$(bash scripts/claim_remote_validation_pod.sh "$OWNER_LABEL")"
+  AUTO_CLAIMED_POD_ID="$(printf '%s' "$AUTO_SSH_INFO_JSON" | jq -r '.id')"
+  SSH_TARGET="root@$(printf '%s' "$AUTO_SSH_INFO_JSON" | jq -r '.ip')"
+  SSH_PORT="$(printf '%s' "$AUTO_SSH_INFO_JSON" | jq -r '.port')"
+  printf '%s\n' "$AUTO_SSH_INFO_JSON" >"$RESULT_DIR/claimed_pod.json"
+fi
+
 push_branch_if_needed() {
   local branch="$1"
   if [[ "$PUSH_BRANCHES" != "1" ]]; then
@@ -61,8 +98,7 @@ push_branch_if_needed() {
 }
 
 remote_setup() {
-  # shellcheck disable=SC2086
-  ssh $SSH_OPTS "$SSH_TARGET" \
+  ssh_cmd "$SSH_TARGET" \
     "REMOTE_REPO_DIR=$(printf '%q' "$REMOTE_REPO_DIR") REPO_REMOTE_URL=$(printf '%q' "$REPO_REMOTE_URL") BOOTSTRAP_DATA=$(printf '%q' "$BOOTSTRAP_DATA") bash -s" <<'EOF'
 set -euo pipefail
 
@@ -100,8 +136,7 @@ run_stage() {
   echo "  branch: $branch"
   echo "  run_id: $run_id"
 
-  # shellcheck disable=SC2086
-  ssh $SSH_OPTS "$SSH_TARGET" \
+  ssh_cmd "$SSH_TARGET" \
     "REMOTE_REPO_DIR=$(printf '%q' "$REMOTE_REPO_DIR") BRANCH_NAME=$(printf '%q' "$branch") RUN_ID_VALUE=$(printf '%q' "$run_id") STAGE_SLUG=$(printf '%q' "$slug") TRAIN_SCRIPT=$(printf '%q' "$script_path") EXTRA_ENV=$(printf '%q' "$extra_env") bash -s" <<'EOF'
 set -euo pipefail
 cd "$REMOTE_REPO_DIR"
@@ -127,12 +162,14 @@ bash scripts/run_remote_experiment.sh "$STAGE_SLUG" "$TRAIN_SCRIPT"
 EOF
 
   if [[ "$PULL_AFTER_EACH" == "1" ]]; then
-    bash scripts/pull_remote_run_artifacts.sh "$SSH_TARGET" "$run_id" "$RESULT_DIR/$stage_name"
+    SSH_PORT="$SSH_PORT" bash scripts/pull_remote_run_artifacts.sh "$SSH_TARGET" "$run_id" "$RESULT_DIR/$stage_name"
   fi
 }
 
 cat >"$RESULT_DIR/sequence.meta.txt" <<EOF
 ssh_target=$SSH_TARGET
+ssh_port=$SSH_PORT
+auto_claimed_pod_id=$AUTO_CLAIMED_POD_ID
 remote_repo_dir=$REMOTE_REPO_DIR
 repo_remote_url=$REPO_REMOTE_URL
 candidate_slug=$CANDIDATE_SLUG
@@ -145,6 +182,7 @@ baseline_script=$BASELINE_SCRIPT
 push_branches=$PUSH_BRANCHES
 pull_after_each=$PULL_AFTER_EACH
 bootstrapped_data=$BOOTSTRAP_DATA
+auto_release_pod=$AUTO_RELEASE_POD
 started_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 

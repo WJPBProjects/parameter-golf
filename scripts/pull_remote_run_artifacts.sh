@@ -22,27 +22,45 @@ RUN_ID="$2"
 LOCAL_DEST_DIR="${3:-$ROOT/remote_results/$RUN_ID}"
 REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/workspace/parameter-golf}"
 SSH_OPTS="${SSH_OPTS:-}"
+SSH_PORT="${SSH_PORT:-}"
 
 mkdir -p "$LOCAL_DEST_DIR/logs" "$LOCAL_DEST_DIR/artifacts"
+
+scp_cmd() {
+  if [[ -n "$SSH_PORT" ]]; then
+    # shellcheck disable=SC2086
+    scp $SSH_OPTS -P "$SSH_PORT" "$@"
+  else
+    # shellcheck disable=SC2086
+    scp $SSH_OPTS "$@"
+  fi
+}
+
+ssh_cmd() {
+  if [[ -n "$SSH_PORT" ]]; then
+    # shellcheck disable=SC2086
+    ssh $SSH_OPTS -p "$SSH_PORT" "$@"
+  else
+    # shellcheck disable=SC2086
+    ssh $SSH_OPTS "$@"
+  fi
+}
 
 copy_required() {
   local remote_rel="$1"
   local local_path="$2"
   local remote_path="${REMOTE_REPO_DIR}/${remote_rel}"
   echo "Pulling required file: ${remote_rel}"
-  # shellcheck disable=SC2086
-  scp $SSH_OPTS "${SSH_TARGET}:${remote_path}" "$local_path"
+  scp_cmd "${SSH_TARGET}:${remote_path}" "$local_path"
 }
 
 copy_optional() {
   local remote_rel="$1"
   local local_path="$2"
   local remote_path="${REMOTE_REPO_DIR}/${remote_rel}"
-  # shellcheck disable=SC2086
-  if ssh $SSH_OPTS "$SSH_TARGET" "test -f $(printf '%q' "$remote_path")"; then
+  if ssh_cmd "$SSH_TARGET" "test -f $(printf '%q' "$remote_path")"; then
     echo "Pulling optional file: ${remote_rel}"
-    # shellcheck disable=SC2086
-    scp $SSH_OPTS "${SSH_TARGET}:${remote_path}" "$local_path"
+    scp_cmd "${SSH_TARGET}:${remote_path}" "$local_path"
   else
     echo "Optional file missing: ${remote_rel}"
   fi
@@ -56,6 +74,7 @@ copy_optional "artifacts/${RUN_ID}/final_model.pt" "$LOCAL_DEST_DIR/artifacts/fi
 
 cat >"$LOCAL_DEST_DIR/pull.meta.txt" <<EOF
 ssh_target=$SSH_TARGET
+ssh_port=$SSH_PORT
 run_id=$RUN_ID
 remote_repo_dir=$REMOTE_REPO_DIR
 local_dest_dir=$LOCAL_DEST_DIR
