@@ -92,13 +92,14 @@ Submission-lane calibration:
 
 - `late-value-embed-qk5`:
   - `py_compile` passed for CUDA and MLX trainer copies
-  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
+  - local MLX runner smoke passed
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/late-value-embed-qk5/logs/preflight_late_value_embed_qk5_20260406_215133.txt`
 - `embedding-skip-parallel-late`:
   - `py_compile` passed for CUDA and MLX trainer copies
-  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
-- `compile-safe-late-qat`, `parallelres-qkgain5`, and `xsa-all`:
+  - local MLX runner smoke passed
+  - log: `/Users/wulfie/code/parameter-golf-worktrees/embedding-skip-parallel-late/logs/preflight_embedding_skip_parallel_late_20260406_215152.txt`
+- `late-value-embed-legal-ttt`, `parallelres-qkgain5`, and `compile-safe-late-qat`:
   - `py_compile` passed for CUDA and MLX trainer copies
-  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
 - Caveat:
   - some branches do not have MLX implementations for their remote-only features, so a local MLX run would not validate the actual remote hypothesis
 

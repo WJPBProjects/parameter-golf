@@ -39,9 +39,9 @@ When preparing a real batch:
 ## Candidates worth considering first
 
 - `late-value-embed-qk5`
-  - original value-path candidate; clean syntax and tiny CPU PyTorch forward preflight on `2026-04-06`
+  - original value-path candidate; clean syntax check and local MLX runner smoke on `2026-04-06`
 - `embedding-skip-parallel-late`
-  - original embedding-reuse candidate; clean syntax and tiny CPU PyTorch forward preflight on `2026-04-06`
+  - original embedding-reuse candidate; clean syntax check and local MLX runner smoke on `2026-04-06`
 - `parallelres-qkgain5`
   - lower-novelty fallback with prior local signal
 - `compile-safe-late-qat`
