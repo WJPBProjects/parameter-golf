@@ -3,3 +3,4 @@
 # slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
 # Use only after queue A completes cleanly and budget remains.
 parallelres-qkgain5	codex/parallel-residuals-pr1204	experiments/parallel-residuals-pr1204/train_gpt.py	QK_GAIN_INIT=5.0 PARALLEL_RESIDUAL=1 PARALLEL_START_LAYER=6 VAL_LOSS_EVERY=1500
+compile-safe-late-qat	codex/compile-safe-late-qat	experiments/compile-safe-late-qat/train_gpt.py	QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 VAL_LOSS_EVERY=1500
