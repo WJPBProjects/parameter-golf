@@ -1,15 +1,39 @@
 # Active Run Status
 
-Last updated: 2026-04-06 20:45 UTC
+Last updated: 2026-04-06 20:58 UTC
 
 ## Current execution
 
-- Active wave: `PAUSED`
-- Profile: `8xH100 fleet prepared for batch ranking`
+- Active wave: `PAUSED_REMOTE_BALANCE`
+- Profile: `8xH100 remote ranking lane with dynamic pod-id SSH`
 - Current pod:
   - `none`
 - Current experiment:
   - `none`
+
+## Current blocker
+
+- RunPod balance is below the minimum resume threshold for an `8xH100` on-demand pod.
+- Current observed error from `runpodctl pod start`:
+  - `Insufficient balance to resume this on-demand pod. You need at least $3.59 (current: $3.01, deficit: $0.58).`
+- Consequence:
+  - no new `8xH100` pod can be started until credits are added
+  - repo and queues are being prepared offline in the meantime
+
+## Latest remote attempts
+
+- Pod `p0q5f3wenzygvr` (`parameter-golf-8xh100-calibration-2`) exited twice under RunPod control during setup:
+  - `Exited by RunPod: 2026-04-06 19:44:38 UTC`
+  - `Exited by RunPod: 2026-04-06 19:49:38 UTC`
+- `compile-safe-late-qat` failure sequence:
+  - first retry exposed missing remote train-script preflight
+  - second retry exposed missing tokenizer cache on the pod volume
+- Infra fixes now in local `main` working tree:
+  - dynamic pod-id SSH resolution in `scripts/run_remote_submission_batch.sh`
+  - retry-through-port-churn in `ssh_cmd`
+  - remote process death detection to avoid hour-long dead waits
+  - tokenizer/vocab presence added to remote bootstrap checks
+  - remote train-script preflight fallback to branch-root `train_gpt.py` when needed
 
 ## Completed calibrations
 
@@ -45,16 +69,19 @@ Submission-lane calibration:
 
 - `/Users/wulfie/code/parameter-golf/remote_results/20260406_171426_merged_record_signalrush`
 - `/Users/wulfie/code/parameter-golf/remote_results/20260406_180723_submission_record_signalrush`
+- `/Users/wulfie/code/parameter-golf/remote_results/submission_batches/20260406_201647_submission_batch_queue_a`
 
 ## Next actions after this run
 
-1. fill the per-pod batch queue files:
-   - `codex_notes/coordination/submission_batch_queue_a.tsv`
-   - `codex_notes/coordination/submission_batch_queue_b.tsv`
-   - `codex_notes/coordination/submission_batch_queue_c.tsv`
-2. launch up to `3` parallel `8xH100` batch runners
-3. keep each pod warm only for its own queue
-4. stop and release each pod immediately after its queue finishes
+1. add enough RunPod credit to resume at least one `8xH100` pod
+2. resume the remote lane with queue A first:
+   - `compile-safe-late-qat`
+   - `late-value-embed-qk5`
+3. then queue B:
+   - `parallelres-qkgain5`
+4. then queue C:
+   - `late-value-embed-legal-ttt`
+5. keep pod sessions warm only while their queue is active, and stop immediately after
 
 ## Billing rule
 

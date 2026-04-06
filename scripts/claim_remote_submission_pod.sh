@@ -78,6 +78,9 @@ EOF
       ip="$(printf '%s' "$ssh_info" | jq -r '.ip')"
       port="$(printf '%s' "$ssh_info" | jq -r '.port')"
       if ssh_ready "$ip" "$port"; then
+        ssh "${SSH_READY_OPTS[@]}" -p "$port" "root@$ip" \
+          'nohup bash -lc "while true; do sleep 3600; done" >/workspace/pg_keepalive.log 2>&1 &' \
+          >/dev/null 2>&1 || true
         printf '%s\n' "$pod_json" >"$claim_dir/pod.get.json"
         printf '%s\n' "$ssh_info" >"$claim_dir/ssh.info.json"
         printf '%s\n' "$ssh_info"

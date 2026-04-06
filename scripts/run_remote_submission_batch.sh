@@ -56,6 +56,7 @@ mkdir -p "$RESULT_DIR"
 QUEUE_REFERENCE_CURVE_FILE="$RESULT_DIR/reference_curve.tsv"
 
 AUTO_CLAIMED_POD_ID=""
+RUNPOD_DYNAMIC_TARGET_ID=""
 
 if [[ -z "$SSH_OPTS" ]]; then
   if resolved_key="$(bash "$ROOT/scripts/resolve_runpod_ssh_key.sh" 2>/dev/null)"; then
@@ -66,13 +67,61 @@ if [[ -z "$SSH_OPTS" ]]; then
 fi
 
 ssh_cmd() {
-  if [[ -n "$SSH_PORT" ]]; then
-    # shellcheck disable=SC2086
-    ssh $SSH_OPTS -p "$SSH_PORT" "$@"
-  else
-    # shellcheck disable=SC2086
-    ssh $SSH_OPTS "$@"
+  local requested_target="$1"
+  shift
+  local attempt
+  local resolved_target="$requested_target"
+  local resolved_port="$SSH_PORT"
+  local ssh_info=""
+  local ip=""
+  local port=""
+  local output=""
+  local rc=1
+  local -a cmd
+
+  for attempt in $(seq 1 12); do
+    resolved_target="$requested_target"
+    resolved_port="$SSH_PORT"
+    if [[ "$requested_target" == runpod:* ]]; then
+      local pod_id="${requested_target#runpod:}"
+      ssh_info="$(runpodctl ssh info "$pod_id")"
+      ip="$(printf '%s' "$ssh_info" | jq -r 'select(has("ip")) | .ip // empty')"
+      port="$(printf '%s' "$ssh_info" | jq -r 'select(has("port")) | .port // empty')"
+      if [[ -z "$ip" || -z "$port" ]]; then
+        sleep 5
+        continue
+      fi
+      resolved_target="root@$ip"
+      resolved_port="$port"
+    fi
+
+    # shellcheck disable=SC2206
+    cmd=(ssh $SSH_OPTS)
+    if [[ -n "$resolved_port" ]]; then
+      cmd+=(-p "$resolved_port")
+    fi
+    cmd+=("$resolved_target")
+    cmd+=("$@")
+
+    if output="$("${cmd[@]}" 2>&1)"; then
+      printf '%s' "$output"
+      return 0
+    fi
+    rc=$?
+    if [[ "$requested_target" != runpod:* || "$rc" != 255 ]]; then
+      printf '%s\n' "$output" >&2
+      return "$rc"
+    fi
+    sleep 5
+  done
+
+  if [[ -n "$ssh_info" ]]; then
+    printf '%s\n' "$ssh_info" >&2
   fi
+  if [[ -n "$output" ]]; then
+    printf '%s\n' "$output" >&2
+  fi
+  return "$rc"
 }
 
 cleanup() {
@@ -85,8 +134,7 @@ trap cleanup EXIT
 if [[ "$TARGET" == "auto" ]]; then
   ssh_info="$(bash "$ROOT/scripts/claim_remote_submission_pod.sh" "$OWNER_LABEL")"
   AUTO_CLAIMED_POD_ID="$(printf '%s' "$ssh_info" | jq -r '.id')"
-  TARGET="root@$(printf '%s' "$ssh_info" | jq -r '.ip')"
-  SSH_PORT="$(printf '%s' "$ssh_info" | jq -r '.port')"
+  TARGET="runpod:$AUTO_CLAIMED_POD_ID"
   printf '%s\n' "$ssh_info" >"$RESULT_DIR/claimed_pod.json"
 fi
 
@@ -226,11 +274,23 @@ if not reference_curve.exists():
     print("NO_REFERENCE")
     sys.exit(0)
 
+lines = [line for line in reference_curve.read_text().splitlines() if line.strip()]
+if not lines:
+    print("NO_REFERENCE")
+    sys.exit(0)
+
+header = lines[0].split("\t")
 ref_rows = []
-for raw in reference_curve.read_text().splitlines()[1:]:
-    if not raw.strip():
-        continue
-    train_time_ms, step, val_bpb, step_avg_ms = raw.split("\t")
+for raw in lines[1:]:
+    parts = raw.split("\t")
+    if header[:4] == ["train_time_ms", "step", "val_bpb", "step_avg_ms"] and len(parts) >= 4:
+        train_time_ms, step, val_bpb, step_avg_ms = parts[:4]
+    elif header[:3] == ["step", "train_time_ms", "val_bpb"] and len(parts) >= 3:
+        step, train_time_ms, val_bpb = parts[:3]
+        step_avg_ms = "0.0"
+    else:
+        print("NO_REFERENCE")
+        sys.exit(0)
     ref_rows.append({
         "train_time_ms": int(train_time_ms),
         "step": int(step),
@@ -289,7 +349,7 @@ git fetch origin
 git switch main >/dev/null 2>&1 || git switch -c main --track origin/main
 git pull --ff-only origin main
 
-if [[ "$BOOTSTRAP_DATA" == "1" && ! -e ./data/datasets/fineweb10B_sp1024/fineweb_val_000000.bin ]]; then
+if [[ "$BOOTSTRAP_DATA" == "1" && ( ! -e ./data/datasets/fineweb10B_sp1024/fineweb_val_000000.bin || ! -e ./data/tokenizers/fineweb_1024_bpe.model || ! -e ./data/tokenizers/fineweb_1024_bpe.vocab ) ]]; then
   python3 data/cached_challenge_fineweb.py --variant sp1024
 fi
 EOF
@@ -384,14 +444,24 @@ rm -f final_model.pt final_model.int8.ptz final_model.int6.ptz
 if [[ -n "$EXTRA_ENV" ]]; then
   eval "export $EXTRA_ENV"
 fi
+resolved_train_script="$TRAIN_SCRIPT"
+if [[ ! -f "$resolved_train_script" && "$(basename "$TRAIN_SCRIPT")" == "train_gpt.py" && -f train_gpt.py ]]; then
+  resolved_train_script="train_gpt.py"
+fi
+if [[ ! -f "$resolved_train_script" ]]; then
+  echo "missing_remote_train_script requested=$TRAIN_SCRIPT resolved=$resolved_train_script branch=$BRANCH_NAME" >&2
+  find . -maxdepth 3 -path './experiments/*/train_gpt.py' -o -name train_gpt.py | sort >&2 || true
+  exit 3
+fi
 export RUN_ID="$RUN_ID_VALUE"
-nohup bash "$REMOTE_REPO_DIR/.codex_tmp/run_remote_submission_8xh100.sh" "$STAGE_SLUG" "$TRAIN_SCRIPT" >"$REMOTE_REPO_DIR/.codex_tmp/${RUN_ID_VALUE}.launch.txt" 2>&1 &
+nohup bash "$REMOTE_REPO_DIR/.codex_tmp/run_remote_submission_8xh100.sh" "$STAGE_SLUG" "$resolved_train_script" >"$REMOTE_REPO_DIR/.codex_tmp/${RUN_ID_VALUE}.launch.txt" 2>&1 &
 echo $! >"$REMOTE_REPO_DIR/.codex_tmp/${RUN_ID_VALUE}.pid"
 EOF
 
   deadline=$(( $(date +%s) + RUN_TIMEOUT_SECONDS ))
   final_detected=0
   early_stop_reason=""
+  monitor_failure_reason=""
   while (( $(date +%s) < deadline )); do
     log_tail="$(ssh_cmd "$TARGET" "test -f $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") && tail -n $EARLY_STOP_LOG_TAIL_LINES $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") || true")"
     if [[ "$(has_final_metric_line "$log_tail")" == "YES" ]]; then
@@ -407,10 +477,15 @@ EOF
         break
       fi
     fi
+    remote_alive="$(ssh_cmd "$TARGET" "pid_file=$(printf '%q' "$REMOTE_REPO_DIR/.codex_tmp/$run_id.pid"); if [[ -f \$pid_file ]] && kill -0 \$(cat \$pid_file) 2>/dev/null; then echo ALIVE; else echo DEAD; fi" || echo DEAD)"
+    if [[ "$remote_alive" == "DEAD" ]]; then
+      monitor_failure_reason="remote_process_exited_before_final_metric"
+      break
+    fi
     sleep "$POLL_SECONDS"
   done
 
-  if [[ "$final_detected" != "1" && -z "$early_stop_reason" ]]; then
+  if [[ "$final_detected" != "1" && -z "$early_stop_reason" && -z "$monitor_failure_reason" ]]; then
     echo "timed out waiting for final metric for $slug" >&2
     ssh_cmd "$TARGET" "tail -n 120 $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") 2>/dev/null || true" >"$case_dir/timeout_tail.txt" || true
     return 1
@@ -418,6 +493,8 @@ EOF
 
   if [[ -n "$early_stop_reason" ]]; then
     finalize_remote_run "$run_id" "$train_script" "EARLY_STOPPED" "$early_stop_reason"
+  elif [[ -n "$monitor_failure_reason" ]]; then
+    finalize_remote_run "$run_id" "$train_script" "FAILED_MONITORED" "$monitor_failure_reason"
   else
     finalize_remote_run "$run_id" "$train_script" "OK_MONITORED" "final_metric_detected"
   fi
