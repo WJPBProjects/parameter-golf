@@ -180,10 +180,13 @@ fi
 
 # Previous stage outputs are disposable and should not block the next stage.
 rm -rf artifacts
+rm -rf .codex_tmp
 rm -f final_model.pt final_model.int8.ptz
+git clean -fd >/dev/null
 
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "remote repo became dirty before stage run" >&2
+  git status --short >&2 || true
   exit 1
 fi
 

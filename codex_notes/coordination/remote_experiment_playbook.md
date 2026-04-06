@@ -237,6 +237,7 @@ Important:
 - the stage runner also deletes disposable `artifacts/` and leftover `final_model*` files before each new stage switch, so old branch snapshots do not block the next branch checkout
 - the stage runner is fetched from `origin/main` for every stage, so older experiment branches do not need to contain the latest remote wrapper scripts themselves
 - if a promoted branch does not contain the expected experiment-local trainer path, the stage runner falls back to the branch root trainer with the same basename, usually `train_gpt.py`
+- before each stage, the helper also removes untracked non-ignored files with `git clean -fd`, so prior branch-only experiment files and temporary wrapper copies do not poison the next stage
 
 ## Validation-pod guard rails
 
