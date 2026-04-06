@@ -140,11 +140,16 @@ log_path = Path(sys.argv[1])
 out_path = Path(sys.argv[2])
 pat = re.compile(r"step:(\d+)/(\d+)\s+val_loss:([0-9.]+)\s+val_bpb:([0-9.]+)\s+train_time:(\d+)ms step_avg:([0-9.]+)ms")
 rows = []
+seen = set()
 for line in log_path.read_text(errors="ignore").splitlines():
     m = pat.search(line)
     if not m:
         continue
-    rows.append((int(m.group(5)), int(m.group(1)), float(m.group(4)), float(m.group(6))))
+    row = (int(m.group(5)), int(m.group(1)), float(m.group(4)), float(m.group(6)))
+    if row in seen:
+        continue
+    seen.add(row)
+    rows.append(row)
 out_path.parent.mkdir(parents=True, exist_ok=True)
 with out_path.open("w") as f:
     f.write("train_time_ms\tstep\tval_bpb\tstep_avg_ms\n")
