@@ -45,6 +45,10 @@ Current scripts:
   - `scripts/run_local_overnight_mlx.sh`
 - remote validation:
   - `scripts/run_remote_experiment.sh`
+- local helper to pull a finished remote run back to this machine:
+  - `scripts/pull_remote_run_artifacts.sh`
+- local helper to drive a stage-3 baseline/control/candidate sequence over SSH:
+  - `scripts/run_remote_validation_sequence.sh`
 - true `8xH100` submission-style run:
   - `scripts/run_remote_submission_8xh100.sh`
 - helper to create the `8xH100` RunPod:
@@ -111,6 +115,31 @@ git switch -C codex/pr824-kgiir-lite --track origin/codex/pr824-kgiir-lite
 
 Repeat the same pattern for any other promoted branch.
 
+## SSH prerequisite
+
+To actually execute remote runs from this machine, the operator must provide a working SSH target for each pod.
+
+Recommended shape:
+
+- create `~/.ssh/config` aliases such as:
+  - `runpod-pg-a`
+  - `runpod-pg-b`
+  - `runpod-pg-c`
+  - `runpod-pg-8x`
+- each alias should include:
+  - host
+  - port
+  - user `root`
+  - the correct `IdentityFile`
+
+Then scripts in this repo can use a stable target like:
+
+```bash
+ssh runpod-pg-a
+```
+
+Do not paste private keys or API tokens into repo notes or chat.
+
 ## Standard runner
 
 Use the wrapper script so remote runs produce a consistent `RUN_ID`, metadata file, and summary file:
@@ -146,6 +175,23 @@ Defaults:
 Override them in the shell only when the experiment explicitly needs it.
 
 This script is for stage 3 only. It is not the final leaderboard-faithful `8xH100` runner.
+
+For the common same-pod baseline/control/candidate sequence from the local machine, use:
+
+```bash
+bash scripts/run_remote_validation_sequence.sh \
+  runpod-pg-a \
+  pr824-kgiir-lite \
+  codex/pr824-kgiir-lite \
+  experiments/pr824-kgiir-lite/train_gpt.py
+```
+
+This local helper:
+
+- optionally pushes `main`, the PR824 positive-control branch, and the candidate branch to `origin`
+- bootstraps the pod repo and dataset if needed
+- runs baseline, control, and candidate in order
+- pulls logs and artifacts back under `remote_results/`
 
 ## True remote submission runner
 

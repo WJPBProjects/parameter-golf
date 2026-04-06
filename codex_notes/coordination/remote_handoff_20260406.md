@@ -24,6 +24,10 @@ Date: `2026-04-06`
 - Fixed the remote wrappers so they actually tee `torchrun` output into the claimed log path:
   - `scripts/run_remote_experiment.sh`
   - `scripts/run_remote_submission_8xh100.sh`
+- Added a local pullback helper for finished remote runs:
+  - `scripts/pull_remote_run_artifacts.sh`
+- Added a local stage-3 queue runner that executes baseline, PR824 mimic, and one candidate over SSH:
+  - `scripts/run_remote_validation_sequence.sh`
 
 ## Minimum expected repo state
 

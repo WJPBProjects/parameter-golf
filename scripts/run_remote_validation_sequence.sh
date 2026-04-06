@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -lt 4 ]]; then
+  cat <<'EOF'
+Usage:
+  bash scripts/run_remote_validation_sequence.sh <ssh-target> <candidate-slug> <candidate-branch> <candidate-train-script>
+
+Examples:
+  bash scripts/run_remote_validation_sequence.sh \
+    runpod-pg-a \
+    pr824-kgiir-lite \
+    codex/pr824-kgiir-lite \
+    experiments/pr824-kgiir-lite/train_gpt.py
+EOF
+  exit 2
+fi
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+SSH_TARGET="$1"
+CANDIDATE_SLUG="$2"
+CANDIDATE_BRANCH="$3"
+CANDIDATE_SCRIPT="$4"
+
+REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/workspace/parameter-golf}"
+REPO_REMOTE_URL="${REPO_REMOTE_URL:-$(git remote get-url origin)}"
+SSH_OPTS="${SSH_OPTS:-}"
+PUSH_BRANCHES="${PUSH_BRANCHES:-1}"
+PULL_AFTER_EACH="${PULL_AFTER_EACH:-1}"
+BOOTSTRAP_DATA="${BOOTSTRAP_DATA:-1}"
+LOCAL_RESULTS_ROOT="${LOCAL_RESULTS_ROOT:-$ROOT/remote_results}"
+STAMP="${STAMP:-$(date +%Y%m%d_%H%M%S)}"
+RESULT_DIR="${LOCAL_RESULTS_ROOT}/${STAMP}_${CANDIDATE_SLUG}"
+
+CONTROL_SLUG="${CONTROL_SLUG:-pr824-mimic}"
+CONTROL_BRANCH="${CONTROL_BRANCH:-codex/pr824-mimic-gatedattn-valueresid}"
+CONTROL_SCRIPT="${CONTROL_SCRIPT:-experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py}"
+BASELINE_SLUG="${BASELINE_SLUG:-baseline}"
+BASELINE_BRANCH="${BASELINE_BRANCH:-main}"
+BASELINE_SCRIPT="${BASELINE_SCRIPT:-train_gpt.py}"
+
+BASELINE_ENV="${BASELINE_ENV:-}"
+CONTROL_ENV="${CONTROL_ENV:-}"
+CANDIDATE_ENV="${CANDIDATE_ENV:-}"
+
+mkdir -p "$RESULT_DIR"
+
+push_branch_if_needed() {
+  local branch="$1"
+  if [[ "$PUSH_BRANCHES" != "1" ]]; then
+    return 0
+  fi
+  if [[ "$branch" == "main" ]]; then
+    git push origin main
+  else
+    git push -u origin "$branch"
+  fi
+}
+
+remote_setup() {
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "$SSH_TARGET" \
+    "REMOTE_REPO_DIR=$(printf '%q' "$REMOTE_REPO_DIR") REPO_REMOTE_URL=$(printf '%q' "$REPO_REMOTE_URL") BOOTSTRAP_DATA=$(printf '%q' "$BOOTSTRAP_DATA") bash -s" <<'EOF'
+set -euo pipefail
+
+if [[ ! -d "$REMOTE_REPO_DIR/.git" ]]; then
+  mkdir -p "$(dirname "$REMOTE_REPO_DIR")"
+  git clone "$REPO_REMOTE_URL" "$REMOTE_REPO_DIR"
+fi
+
+cd "$REMOTE_REPO_DIR"
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "remote repo is dirty: $REMOTE_REPO_DIR" >&2
+  exit 1
+fi
+
+git fetch origin
+git switch main >/dev/null 2>&1 || git switch -c main --track origin/main
+git pull --ff-only origin main
+
+if [[ "$BOOTSTRAP_DATA" == "1" && ! -e ./data/datasets/fineweb10B_sp1024/fineweb_val_000000.bin ]]; then
+  python3 data/cached_challenge_fineweb.py --variant sp1024
+fi
+EOF
+}
+
+run_stage() {
+  local stage_name="$1"
+  local branch="$2"
+  local slug="$3"
+  local script_path="$4"
+  local extra_env="${5:-}"
+  local run_id="remote_${CANDIDATE_SLUG}_${stage_name}_${STAMP}"
+
+  echo "=== Running stage: $stage_name ==="
+  echo "  branch: $branch"
+  echo "  run_id: $run_id"
+
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "$SSH_TARGET" \
+    "REMOTE_REPO_DIR=$(printf '%q' "$REMOTE_REPO_DIR") BRANCH_NAME=$(printf '%q' "$branch") RUN_ID_VALUE=$(printf '%q' "$run_id") STAGE_SLUG=$(printf '%q' "$slug") TRAIN_SCRIPT=$(printf '%q' "$script_path") EXTRA_ENV=$(printf '%q' "$extra_env") bash -s" <<'EOF'
+set -euo pipefail
+cd "$REMOTE_REPO_DIR"
+git fetch origin
+if [[ "$BRANCH_NAME" == "main" ]]; then
+  git switch main
+  git pull --ff-only origin main
+else
+  git fetch origin "$BRANCH_NAME"
+  git switch -C "$BRANCH_NAME" --track "origin/$BRANCH_NAME" >/dev/null 2>&1 || git switch "$BRANCH_NAME"
+fi
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "remote repo became dirty before stage run" >&2
+  exit 1
+fi
+
+if [[ -n "$EXTRA_ENV" ]]; then
+  eval "export $EXTRA_ENV"
+fi
+export RUN_ID="$RUN_ID_VALUE"
+bash scripts/run_remote_experiment.sh "$STAGE_SLUG" "$TRAIN_SCRIPT"
+EOF
+
+  if [[ "$PULL_AFTER_EACH" == "1" ]]; then
+    bash scripts/pull_remote_run_artifacts.sh "$SSH_TARGET" "$run_id" "$RESULT_DIR/$stage_name"
+  fi
+}
+
+cat >"$RESULT_DIR/sequence.meta.txt" <<EOF
+ssh_target=$SSH_TARGET
+remote_repo_dir=$REMOTE_REPO_DIR
+repo_remote_url=$REPO_REMOTE_URL
+candidate_slug=$CANDIDATE_SLUG
+candidate_branch=$CANDIDATE_BRANCH
+candidate_script=$CANDIDATE_SCRIPT
+control_branch=$CONTROL_BRANCH
+control_script=$CONTROL_SCRIPT
+baseline_branch=$BASELINE_BRANCH
+baseline_script=$BASELINE_SCRIPT
+push_branches=$PUSH_BRANCHES
+pull_after_each=$PULL_AFTER_EACH
+bootstrapped_data=$BOOTSTRAP_DATA
+started_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
+
+push_branch_if_needed "$BASELINE_BRANCH"
+push_branch_if_needed "$CONTROL_BRANCH"
+push_branch_if_needed "$CANDIDATE_BRANCH"
+
+remote_setup
+run_stage baseline "$BASELINE_BRANCH" "$BASELINE_SLUG" "$BASELINE_SCRIPT" "$BASELINE_ENV"
+run_stage control "$CONTROL_BRANCH" "$CONTROL_SLUG" "$CONTROL_SCRIPT" "$CONTROL_ENV"
+run_stage candidate "$CANDIDATE_BRANCH" "$CANDIDATE_SLUG" "$CANDIDATE_SCRIPT" "$CANDIDATE_ENV"
+
+echo "Sequence complete. Results are under: $RESULT_DIR"
