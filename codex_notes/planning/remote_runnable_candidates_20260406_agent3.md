@@ -33,6 +33,7 @@ Current main worktree note: `main` has unrelated active-run edits in `codex_note
 ## Local-only or not currently fetchable
 
 - `codex/late-value-embed-legal-ttt@cb42c4c`: now pushed after this audit was written. It adds legal score-first TTT on top of the fetchable `late-value-embed-qk5` branch and is queued in `submission_batch_queue_c.tsv`.
+- `codex/embedding-skip-parallel-late@db0e090`: now pushed after this audit was written. It adds a late embedding-side channel on top of the remote-runnable parallel-residual base and is queued in `submission_batch_queue_c.tsv`.
 - `codex/pr824-qkgain5-kgiir-lite`: has a tracked-looking local experiment and a good local result, but no `origin/codex/pr824-qkgain5-kgiir-lite`; not remote-runnable until pushed.
 - `codex/pr824-attnres-lite`: local branch only; origin branch missing. It also only had `train_gpt_mlx.py` tracked in the branch snapshot checked earlier.
 - `codex/pr824-value-residual-only`: local branch only; no origin branch.

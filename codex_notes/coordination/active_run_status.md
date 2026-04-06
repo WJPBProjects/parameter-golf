@@ -81,6 +81,7 @@ Submission-lane calibration:
    - `parallelres-qkgain5`
 4. then queue C:
    - `late-value-embed-legal-ttt`
+   - `embedding-skip-parallel-late`
 5. keep pod sessions warm only while their queue is active, and stop immediately after
 
 ## Billing rule
