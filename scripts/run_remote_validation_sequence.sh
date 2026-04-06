@@ -111,6 +111,9 @@ remote_setup() {
 set -euo pipefail
 
 if [[ ! -d "$REMOTE_REPO_DIR/.git" ]]; then
+  if [[ -e "$REMOTE_REPO_DIR" ]]; then
+    rm -rf "$REMOTE_REPO_DIR"
+  fi
   mkdir -p "$(dirname "$REMOTE_REPO_DIR")"
   git clone "$REPO_REMOTE_URL" "$REMOTE_REPO_DIR"
 fi
