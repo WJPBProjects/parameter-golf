@@ -210,6 +210,31 @@ This local helper:
 - pulls logs and artifacts back under `remote_results/`
 - stops and releases the pod by default when the sequence exits
 
+For crash recovery or laptop restarts, the same helper now supports resuming mid-sequence:
+
+```bash
+START_STAGE=control \
+SKIP_REMOTE_SETUP=1 \
+BASELINE_RUN_ID=remote_pr824-kgiir-lite_baseline_20260406_153725 \
+bash scripts/run_remote_validation_sequence.sh \
+  root@103.207.149.118 \
+  pr824-kgiir-lite \
+  codex/pr824-kgiir-lite \
+  experiments/pr824-kgiir-lite/train_gpt.py
+```
+
+Use:
+
+- `START_STAGE=control` to skip baseline and continue with control + candidate
+- `START_STAGE=candidate` to skip directly to the candidate
+- `BASELINE_RUN_ID=...` and `CONTROL_RUN_ID=...` to pull previously completed stage outputs into the local result directory
+- `SKIP_REMOTE_SETUP=1` only when the pod repo and dataset are already known-good
+
+Important:
+
+- `logs/` and `artifacts/` are disposable run outputs and are intentionally ignored by git
+- a remote repo that only contains ignored outputs is still considered clean enough for the next stage
+
 ## Validation-pod guard rails
 
 The normal stage-3 validation flow is now:

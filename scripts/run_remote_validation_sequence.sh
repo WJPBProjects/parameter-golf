@@ -43,6 +43,8 @@ STAMP="${STAMP:-$(date +%Y%m%d_%H%M%S)}"
 RESULT_DIR="${LOCAL_RESULTS_ROOT}/${STAMP}_${CANDIDATE_SLUG}"
 AUTO_RELEASE_POD="${AUTO_RELEASE_POD:-1}"
 OWNER_LABEL="${OWNER_LABEL:-main-agent}"
+START_STAGE="${START_STAGE:-baseline}"
+SKIP_REMOTE_SETUP="${SKIP_REMOTE_SETUP:-0}"
 
 AUTO_CLAIMED_POD_ID=""
 AUTO_SSH_INFO_JSON=""
@@ -57,6 +59,9 @@ BASELINE_SCRIPT="${BASELINE_SCRIPT:-train_gpt.py}"
 BASELINE_ENV="${BASELINE_ENV:-}"
 CONTROL_ENV="${CONTROL_ENV:-}"
 CANDIDATE_ENV="${CANDIDATE_ENV:-}"
+BASELINE_RUN_ID="${BASELINE_RUN_ID:-}"
+CONTROL_RUN_ID="${CONTROL_RUN_ID:-}"
+CANDIDATE_RUN_ID="${CANDIDATE_RUN_ID:-}"
 
 mkdir -p "$RESULT_DIR"
 
@@ -103,6 +108,18 @@ push_branch_if_needed() {
   else
     git push -u origin "$branch"
   fi
+}
+
+stage_index() {
+  case "$1" in
+    baseline) echo 1 ;;
+    control) echo 2 ;;
+    candidate) echo 3 ;;
+    *)
+      echo "invalid stage: $1" >&2
+      exit 2
+      ;;
+  esac
 }
 
 remote_setup() {
@@ -194,6 +211,11 @@ push_branches=$PUSH_BRANCHES
 pull_after_each=$PULL_AFTER_EACH
 bootstrapped_data=$BOOTSTRAP_DATA
 auto_release_pod=$AUTO_RELEASE_POD
+start_stage=$START_STAGE
+skip_remote_setup=$SKIP_REMOTE_SETUP
+baseline_run_id=$BASELINE_RUN_ID
+control_run_id=$CONTROL_RUN_ID
+candidate_run_id=$CANDIDATE_RUN_ID
 started_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
@@ -201,9 +223,28 @@ push_branch_if_needed "$BASELINE_BRANCH"
 push_branch_if_needed "$CONTROL_BRANCH"
 push_branch_if_needed "$CANDIDATE_BRANCH"
 
-remote_setup
-run_stage baseline "$BASELINE_BRANCH" "$BASELINE_SLUG" "$BASELINE_SCRIPT" "$BASELINE_ENV"
-run_stage control "$CONTROL_BRANCH" "$CONTROL_SLUG" "$CONTROL_SCRIPT" "$CONTROL_ENV"
-run_stage candidate "$CANDIDATE_BRANCH" "$CANDIDATE_SLUG" "$CANDIDATE_SCRIPT" "$CANDIDATE_ENV"
+if [[ "$SKIP_REMOTE_SETUP" != "1" ]]; then
+  remote_setup
+fi
+
+if [[ "$(stage_index "$START_STAGE")" -gt 1 && -n "$BASELINE_RUN_ID" && "$PULL_AFTER_EACH" == "1" ]]; then
+  SSH_PORT="$SSH_PORT" bash scripts/pull_remote_run_artifacts.sh "$SSH_TARGET" "$BASELINE_RUN_ID" "$RESULT_DIR/baseline"
+fi
+
+if [[ "$(stage_index "$START_STAGE")" -gt 2 && -n "$CONTROL_RUN_ID" && "$PULL_AFTER_EACH" == "1" ]]; then
+  SSH_PORT="$SSH_PORT" bash scripts/pull_remote_run_artifacts.sh "$SSH_TARGET" "$CONTROL_RUN_ID" "$RESULT_DIR/control"
+fi
+
+if [[ "$(stage_index "$START_STAGE")" -le 1 ]]; then
+  run_stage baseline "$BASELINE_BRANCH" "$BASELINE_SLUG" "$BASELINE_SCRIPT" "$BASELINE_ENV"
+fi
+
+if [[ "$(stage_index "$START_STAGE")" -le 2 ]]; then
+  run_stage control "$CONTROL_BRANCH" "$CONTROL_SLUG" "$CONTROL_SCRIPT" "$CONTROL_ENV"
+fi
+
+if [[ "$(stage_index "$START_STAGE")" -le 3 ]]; then
+  run_stage candidate "$CANDIDATE_BRANCH" "$CANDIDATE_SLUG" "$CANDIDATE_SCRIPT" "$CANDIDATE_ENV"
+fi
 
 echo "Sequence complete. Results are under: $RESULT_DIR"

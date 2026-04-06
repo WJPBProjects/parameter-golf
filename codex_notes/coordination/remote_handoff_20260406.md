@@ -31,6 +31,13 @@ Date: `2026-04-06`
 - Added local validation-pod claim/release helpers:
   - `scripts/claim_remote_validation_pod.sh`
   - `scripts/release_remote_validation_pod.sh`
+- Made the stage-3 queue runner restart-safe:
+  - `START_STAGE=control|candidate`
+  - `BASELINE_RUN_ID=...`
+  - `CONTROL_RUN_ID=...`
+  - `SKIP_REMOTE_SETUP=1`
+- Fixed multi-stage remote cleanliness by ignoring:
+  - `artifacts/`
 
 ## Minimum expected repo state
 
@@ -44,6 +51,10 @@ Before using the remote wrappers, make sure the checkout includes the log-captur
 - Reason:
   - without that, the wrapper cannot satisfy the repo's own remote-result validity rules
   - the summary file will claim a log path that was never written
+- Also make sure:
+  - `.gitignore` includes `artifacts/`
+- Reason:
+  - without that, a successful baseline run dirties the remote repo and the next control/candidate stage will fail its pre-run cleanliness check
 
 ## Current operating model
 
