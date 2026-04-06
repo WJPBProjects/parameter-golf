@@ -89,8 +89,8 @@ echo "  log:        $LOG_PATH"
 echo "  meta:       $META_PATH"
 
 set +e
-torchrun --standalone --nproc_per_node="$NPROC_PER_NODE" "$TRAIN_SCRIPT" "$@"
-CMD_STATUS=$?
+torchrun --standalone --nproc_per_node="$NPROC_PER_NODE" "$TRAIN_SCRIPT" "$@" 2>&1 | tee "$LOG_PATH"
+CMD_STATUS=${PIPESTATUS[0]}
 set -e
 
 if [[ $CMD_STATUS -eq 0 ]]; then
