@@ -1,5 +1,26 @@
 # Results Snapshot (2026-04-02)
 
+## Remote shakedown update (2026-04-06)
+
+See:
+
+- `/Users/wulfie/code/parameter-golf/codex_notes/coordination/remote_validation_shakedown_20260406.md`
+
+Stage-3 same-pod RunPod results:
+
+| Stage | Post-quant val_bpb | Delta vs same-pod baseline | Step avg | Artifact bytes | Log |
+|---|---:|---:|---:|---:|---|
+| `baseline` | `1.33471717` | `0` | `455.65ms` | `13508130` | `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/baseline/logs/remote_pr824-kgiir-lite_baseline_20260406_153725.txt` |
+| `pr824_mimic` | `1.34315176` | `+0.00843459` | `516.81ms` | `12946687` | `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/control/logs/remote_pr824-kgiir-lite_control_20260406_153725.txt` |
+| `pr824_kgiir_lite` | `1.34130189` | `+0.00658472` | `488.60ms` | `13193091` | `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/candidate/logs/remote_pr824-kgiir-lite_candidate_20260406_153725.txt` |
+
+Main conclusions:
+
+- The remote validation loop now works end to end.
+- The local positive control failed remotely.
+- The best local candidate also failed remotely, although it beat the remote control.
+- This means the current local harness is useful for filtering, but not sufficient for trusting this family without remote confirmation.
+
 ## Completed confirm-tier rerun wave
 
 Reference baseline:

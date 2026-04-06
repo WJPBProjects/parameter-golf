@@ -20,15 +20,19 @@ The queue below reflects the stronger April 2 local confirm wave, not the older 
 
 ### 1. Baseline sanity run
 
-- Status: `TODO`
+- Status: `DONE`
 - Why:
   - every promoted experiment should be judged against a same-pod baseline
 - Command:
   - `bash scripts/run_remote_experiment.sh baseline train_gpt.py`
+- Latest result:
+  - `remote_pr824-kgiir-lite_baseline_20260406_153725`
+  - post-quant `val_bpb: 1.33471717`
+  - log: `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/baseline/logs/remote_pr824-kgiir-lite_baseline_20260406_153725.txt`
 
 ### 2. PR824 mimic positive control
 
-- Status: `TODO`
+- Status: `DONE`
 - Branch:
   - `codex/pr824-mimic-gatedattn-valueresid`
 - Worktree:
@@ -38,12 +42,17 @@ The queue below reflects the stronger April 2 local confirm wave, not the older 
   - fresh local confirm: `1.66770976` on `pr824_stacks_20260402`
 - Command:
   - `bash scripts/run_remote_experiment.sh pr824-mimic experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py`
+- Latest result:
+  - `remote_pr824-kgiir-lite_control_20260406_153725`
+  - post-quant `val_bpb: 1.34315176`
+  - worse than same-pod baseline `1.33471717`
+  - log: `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/control/logs/remote_pr824-kgiir-lite_control_20260406_153725.txt`
 
 ## Highest-priority promoted candidates
 
 ### 3. PR824 + KGIIR-lite
 
-- Status: `TODO`
+- Status: `DONE`
 - Branch:
   - `codex/pr824-kgiir-lite`
 - Worktree:
@@ -54,6 +63,11 @@ The queue below reflects the stronger April 2 local confirm wave, not the older 
   - beats local baseline, PR824 mimic, and `pr824-qkgain5`
 - Command:
   - `bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py`
+- Latest result:
+  - `remote_pr824-kgiir-lite_candidate_20260406_153725`
+  - post-quant `val_bpb: 1.34130189`
+  - better than remote PR824 mimic but still worse than same-pod baseline `1.33471717`
+  - log: `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/candidate/logs/remote_pr824-kgiir-lite_candidate_20260406_153725.txt`
 
 ### 4. PR824 + QK_GAIN=5.0
 
@@ -68,6 +82,9 @@ The queue below reflects the stronger April 2 local confirm wave, not the older 
   - currently the best simpler stack behind `pr824-kgiir-lite`
 - Command:
   - `bash scripts/run_remote_experiment.sh pr824-qkgain5 experiments/pr824-qkgain5/train_gpt.py`
+- New priority note:
+  - after the `2026-04-06` shakedown, do not assume PR824-family local wins transfer remotely
+  - this branch now needs a fresh same-pod remote test before any stage-4 consideration
 
 ## Remote-only / CUDA-specific follow-up
 

@@ -1,19 +1,25 @@
 # Active Run Status
 
-Last updated: 2026-04-02 19:21 BST
+Last updated: 2026-04-06 16:31 WEST
 
-## Current local execution
+## Current execution
 
 - Active wave: `PAUSED`
-- Profile: `confirm`
+- Profile: `remote-shakedown complete`
 - Run id: `none`
 - Current session: `none`
 - Current experiment: `none`
 
 ## Pause reason
 
-- User asked to pause after the next run finished and summarize.
-- `pr824_kgiir_lite` completed, `pr824_attnres_lite` was fixed branch-locally and rerun manually, and all `run_local_wave.sh` / `train_gpt_mlx.py` processes are now stopped.
+- Stage-3 remote shakedown completed and the validation pod was stopped cleanly.
+- There are no active local MLX or remote `torchrun` jobs.
+- Latest remote sequence:
+  - baseline `1.33471717`
+  - PR824 mimic `1.34315176`
+  - PR824 + KGIIR-lite `1.34130189`
+- Reference note:
+  - `/Users/wulfie/code/parameter-golf/codex_notes/coordination/remote_validation_shakedown_20260406.md`
 
 ## Completed reference waves
 

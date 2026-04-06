@@ -71,19 +71,53 @@
 
 ## Promotion Decision
 
-- Promote to remote: READY
+- Promote to remote: HOLD
 - Reason:
-  - Clear local win and good positive-control behavior for the harness.
-- Remote priority: high
+  - Clear local win, but remote stage-3 validation regressed versus the same-pod CUDA baseline.
+- Remote priority: medium
 
 ## Remote Training
 
-- Status: TODO
+- Status: FAIL
+- Date: `2026-04-06`
+- Seed(s): `1337`
+- Machine / provider:
+  - `RunPod 1xH100`
+- Run identifier:
+  - `remote_pr824-kgiir-lite_control_20260406_153725`
+- Log path:
+  - `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/control/logs/remote_pr824-kgiir-lite_control_20260406_153725.txt`
+- Artifact path(s):
+  - `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/control/artifacts/final_model.int8.ptz`
+  - `/Users/wulfie/code/parameter-golf/remote_results/20260406_153725_pr824-kgiir-lite/control/artifacts/final_model.pt`
+- Pre-quant:
+  - `val_bpb: 1.3418`
+- Post-quant:
+  - `val_bpb: 1.34315176`
+- Speed / wallclock:
+  - `516.81ms/step`
+  - stopped at `step 1161` on the `600s` wallclock cap
+- Artifact size:
+  - `12946687 bytes`
+- Notes:
+  - Same-pod baseline for this shakedown was `1.33471717`, so the remote result is directionally worse despite strong local wins.
+
+## Results Summary
+
+- Pre-quant:
+  - local confirm best: `1.66814857`
+  - remote stage-3: `1.3418`
+- Post-quant:
+  - remote stage-3: `1.34315176`
+- Speed / wallclock:
+  - remote `516.81ms/step`
+- Artifact size:
+  - `12946687 bytes`
 
 ## Conclusion
 
-- This is the strongest evidence so far that the local MLX harness can detect a real directionally correct improvement.
+- This is still a valid local positive control, but it is not a remote positive control. The local harness can rank ideas, but this branch shows that local wins do not automatically transfer to CUDA.
 
 ## Next step
 
-- Mine the same family further with `value_residual` and related value-path ideas.
+- Use this as a warning case, not as a submission candidate. Any next PR824-family branch now needs remote validation before it is trusted.
