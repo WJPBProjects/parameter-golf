@@ -164,11 +164,12 @@ run_stage() {
   echo "  branch: $branch"
   echo "  run_id: $run_id"
 
-  ssh_cmd "$SSH_TARGET" \
+ssh_cmd "$SSH_TARGET" \
     "REMOTE_REPO_DIR=$(printf '%q' "$REMOTE_REPO_DIR") BRANCH_NAME=$(printf '%q' "$branch") RUN_ID_VALUE=$(printf '%q' "$run_id") STAGE_SLUG=$(printf '%q' "$slug") TRAIN_SCRIPT=$(printf '%q' "$script_path") EXTRA_ENV=$(printf '%q' "$extra_env") bash -s" <<'EOF'
 set -euo pipefail
 cd "$REMOTE_REPO_DIR"
 git fetch origin
+git fetch origin main
 if [[ "$BRANCH_NAME" == "main" ]]; then
   git switch main
   git pull --ff-only origin main
@@ -186,11 +187,15 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
+RUNNER_SCRIPT="/tmp/run_remote_experiment_from_main.sh"
+git show origin/main:scripts/run_remote_experiment.sh >"$RUNNER_SCRIPT"
+chmod +x "$RUNNER_SCRIPT"
+
 if [[ -n "$EXTRA_ENV" ]]; then
   eval "export $EXTRA_ENV"
 fi
 export RUN_ID="$RUN_ID_VALUE"
-bash scripts/run_remote_experiment.sh "$STAGE_SLUG" "$TRAIN_SCRIPT"
+bash "$RUNNER_SCRIPT" "$STAGE_SLUG" "$TRAIN_SCRIPT"
 EOF
 
   if [[ "$PULL_AFTER_EACH" == "1" ]]; then
