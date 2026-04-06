@@ -284,6 +284,7 @@ if [[ ! -d "$REMOTE_REPO_DIR/.git" ]]; then
 fi
 
 cd "$REMOTE_REPO_DIR"
+git remote set-url origin "$REPO_REMOTE_URL"
 git fetch origin
 git switch main >/dev/null 2>&1 || git switch -c main --track origin/main
 git pull --ff-only origin main

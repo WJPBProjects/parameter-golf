@@ -136,6 +136,7 @@ if [[ ! -d "$REMOTE_REPO_DIR/.git" ]]; then
 fi
 
 cd "$REMOTE_REPO_DIR"
+git remote set-url origin "$REPO_REMOTE_URL"
 
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "remote repo is dirty: $REMOTE_REPO_DIR" >&2
