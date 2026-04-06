@@ -70,14 +70,16 @@ Current seed file:
 - Treat existing public PR implementations as controls or inspirations, not as final submission targets.
 - Do not spend the true `8xH100` submission lane on a straight reimplementation of an existing PR.
 - The old `1xH100` validation fleet is retired for candidate ranking.
-- Remote ranking should happen on the `3`-pod `8xH100` fleet.
-- One remote agent/process should own one `8xH100` pod at a time.
+- Remote ranking should happen only on the true `8xH100` submission lane.
+- Default budget policy is `1` warm `8xH100` pod at a time, not parallel pods.
+- Pod A is the primary submission pod; Pod C is the fallback.
+- Pod B was removed after repeated host instability and should not be referenced again.
 - Prefer the submission batch runner for remote ranking:
   - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_a.tsv`
-  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_b.tsv`
-  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_c.tsv`
+- Use queue B and queue C as overflow queues, not parallel launch defaults, unless the user explicitly approves a larger spend.
 - The submission batch runner will claim and release one pod automatically.
-- Keep each claimed `8xH100` pod warm only for its own sequential batch, then stop it.
+- Keep each claimed `8xH100` pod warm only for its own sequential batch, then stop it immediately.
+- Do local and static preflight first. Do not spend paid `8xH100` time debugging missing files, broken trainer paths, or obviously bad setup.
 - Submission-stage candidates should contain a meaningfully novel contribution from this repo:
   - a new composition across ideas
   - a new extension or ablation-backed variant

@@ -1,6 +1,9 @@
 # Generic queue template
-# Copy entries into the per-pod queue files below for a real batch:
+# Copy entries into queue A first for a real batch:
 # - codex_notes/coordination/submission_batch_queue_a.tsv
+#
+# Use queue B and queue C only as overflow queues after queue A completes
+# cleanly and budget remains:
 # - codex_notes/coordination/submission_batch_queue_b.tsv
 # - codex_notes/coordination/submission_batch_queue_c.tsv
 #

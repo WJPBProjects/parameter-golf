@@ -10,10 +10,10 @@ Date: `2026-04-06`
   - `scripts/run_remote_submission_8xh100.sh`
 - Added a helper to create `8xH100` submission-fleet pods:
   - `scripts/create_remote_submission_pod.sh`
-- Added claim/release helpers for the new `3`-pod `8xH100` ranking fleet:
+- Added claim/release helpers for the `8xH100` submission fleet:
   - `scripts/claim_remote_submission_pod.sh`
   - `scripts/release_remote_submission_pod.sh`
-- Added a local batch runner for the `8xH100` fleet:
+- Added a local batch runner for the `8xH100` submission lane:
   - `scripts/run_remote_submission_batch.sh`
 - Made local stage wallclock caps explicit:
   - `scripts/run_local_screen_mlx.sh` -> `600s`
@@ -65,17 +65,21 @@ Before using the remote wrappers, make sure the checkout includes the log-captur
 
 1. Local screen
 2. Local confirm
-3. Real remote ranking on the `3`-pod `8xH100` fleet
+3. Real remote ranking on the true `8xH100` submission lane
 4. Submission or rerun confirmation on the same `8xH100` lane
 
 ## Important policy
 
 - The `1xH100` validation fleet has been retired and deleted.
-- The `8xH100` lane now has `3` pods and is the main remote ranking lane.
-- Run one sequential candidate batch per claimed pod.
-- Keep all three pods stopped unless they are actively serving a batch.
+- The `8xH100` lane is the only trusted remote ranking lane.
+- Current budget policy is `1` warm `8xH100` pod at a time.
+- Run one sequential candidate batch on Pod A first.
+- Use Pod C only as fallback or overflow.
+- Pod B was deleted after repeated RunPod-side exits during setup.
+- Keep all remaining pods stopped unless they are actively serving a batch.
 - Do not spend the `8xH100` submission lane on a straight reimplementation of an existing PR.
 - Existing PR-inspired branches are allowed as controls, not default final submission targets.
+- Do local and static preflight first. Do not spend paid `8xH100` time debugging missing files or broken trainer paths.
 
 ## Where to look first
 
@@ -93,21 +97,21 @@ Before using the remote wrappers, make sure the checkout includes the log-captur
 
 - `8xH100` Pod A:
   - `bg36rohzqz8svz`
-- `8xH100` Pod B:
-  - `p0q5f3wenzygvr`
 - `8xH100` Pod C:
   - `h91bgyz08fp9dk`
 
 ## Current pod state intent
 
-- All three `8xH100` pods should remain stopped until claimed by a batch runner.
+- All `8xH100` pods should remain stopped until claimed by a batch runner.
 - Each claimed pod should stay warm only for its own sequential queue.
 - Stop the pod immediately when its queue finishes.
 
 ## Recommended next action
 
-- Fill the three per-pod queue files:
+- Fill the queue files in priority order:
   - `submission_batch_queue_a.tsv`
   - `submission_batch_queue_b.tsv`
   - `submission_batch_queue_c.tsv`
-- Launch up to `3` parallel `8xH100` batch runners with `auto` pod claiming.
+- Launch queue A first:
+  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_a.tsv`
+- Launch queue B or queue C only if queue A completes cleanly and budget remains.

@@ -1,6 +1,6 @@
-# Pod C queue
+# Overflow queue C
 # Format:
 # slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
-# If no shared submission_reference_curve.tsv exists yet, put a control or trusted baseline first.
+# Use only after queue A completes cleanly and budget remains.
 late-value-embed-legal-ttt	codex/late-value-embed-legal-ttt	experiments/late-value-embed-legal-ttt/train_gpt.py	VE_ENABLED=1 VE_DIM=128 VE_LAYERS=7,8 QK_GAIN_INIT=5.0 TTT_ENABLED=1 TTT_FREEZE_BLOCKS=2 TTT_EPOCHS=3 TTT_LR=0.002 EVAL_STRIDE=64 VAL_LOSS_EVERY=1500
 embedding-skip-parallel-late	codex/embedding-skip-parallel-late	experiments/embedding-skip-parallel-late/train_gpt.py	SKIP_EMB_ENABLED=1 SKIP_EMB_DIM=128 SKIP_EMB_LAYERS=6,7,8 QK_GAIN_INIT=5.0 VAL_LOSS_EVERY=1500

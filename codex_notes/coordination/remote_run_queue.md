@@ -11,7 +11,8 @@ Use this file with:
 
 - The `1xH100` lane is not trusted for candidate ranking.
 - The `8xH100` lane is trusted.
-- Remote candidate ranking should therefore happen on the `3`-pod `8xH100` fleet.
+- Remote candidate ranking should therefore happen only on the `8xH100` submission lane.
+- Current budget policy is one warm `8xH100` pod at a time.
 
 ## Calibration summary
 
@@ -28,14 +29,12 @@ Use this file with:
 
 When preparing a real batch:
 
-1. fill the three per-pod queue files:
+1. fill queue A first:
    - `submission_batch_queue_a.tsv`
-   - `submission_batch_queue_b.tsv`
-   - `submission_batch_queue_c.tsv`
-2. group candidates into three pod-sized batches
-3. run one batch per pod
-4. keep each pod warm only for its own batch
-5. stop all pods immediately when their batches finish
+2. run queue A on one warm `8xH100` pod
+3. keep that pod warm only for queue A
+4. stop it immediately when queue A finishes
+5. only then consider queue B and queue C, if budget remains and the earlier results justify more spend
 
 ## Candidates worth considering first
 
@@ -61,3 +60,8 @@ The executable batch files are:
 - `codex_notes/coordination/submission_batch_queue_a.tsv`
 - `codex_notes/coordination/submission_batch_queue_b.tsv`
 - `codex_notes/coordination/submission_batch_queue_c.tsv`
+
+Operationally:
+
+- queue A is the default next live queue
+- queue B and queue C are overflow queues, not default parallel launches

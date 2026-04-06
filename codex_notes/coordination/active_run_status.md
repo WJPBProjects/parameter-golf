@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-06 20:58 UTC
+Last updated: 2026-04-06 22:05 UTC
 
 ## Current execution
 
@@ -22,7 +22,7 @@ Last updated: 2026-04-06 20:58 UTC
 
 ## Latest remote attempts
 
-- Pod `p0q5f3wenzygvr` (`parameter-golf-8xh100-calibration-2`) exited twice under RunPod control during setup:
+- Pod `p0q5f3wenzygvr` (`parameter-golf-8xh100-calibration-2`) exited twice under RunPod control during setup and has since been deleted from the fleet:
   - `Exited by RunPod: 2026-04-06 19:44:38 UTC`
   - `Exited by RunPod: 2026-04-06 19:49:38 UTC`
 - `compile-safe-late-qat` failure sequence:
@@ -74,18 +74,23 @@ Submission-lane calibration:
 ## Next actions after this run
 
 1. add enough RunPod credit to resume at least one `8xH100` pod
-2. resume the remote lane with queue A first:
+2. resume the remote lane with exactly one warm `8xH100` pod:
+   - prefer Pod A
+   - use Pod C only as fallback
+3. run queue A first:
    - `compile-safe-late-qat`
    - `late-value-embed-qk5`
-3. then queue B:
+4. only if queue A completes cleanly and budget remains, run queue B:
    - `parallelres-qkgain5`
-4. then queue C:
+5. only if budget still remains, run queue C:
    - `late-value-embed-legal-ttt`
    - `embedding-skip-parallel-late`
-5. keep pod sessions warm only while their queue is active, and stop immediately after
+6. keep the pod warm only while its current queue is active, and stop immediately after
+7. do not spend paid `8xH100` time on repeated setup debugging; stop and fix locally first
 
 ## Billing rule
 
 - no other pods should be left running unless they are actively serving the current batch
 - all `1xH100` validation pods have been deleted
-- all `8xH100` fleet pods are currently stopped
+- Pod B has been deleted from the `8xH100` fleet after instability
+- all remaining `8xH100` fleet pods are currently stopped

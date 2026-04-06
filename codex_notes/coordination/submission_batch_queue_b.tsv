@@ -1,5 +1,5 @@
-# Pod B queue
+# Overflow queue B
 # Format:
 # slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
-# If no shared submission_reference_curve.tsv exists yet, put a control or trusted baseline first.
+# Use only after queue A completes cleanly and budget remains.
 parallelres-qkgain5	codex/parallel-residuals-pr1204	experiments/parallel-residuals-pr1204/train_gpt.py	QK_GAIN_INIT=5.0 PARALLEL_RESIDUAL=1 PARALLEL_START_LAYER=6 VAL_LOSS_EVERY=1500

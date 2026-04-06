@@ -16,8 +16,9 @@ Use it together with:
 
 - The old `1xH100` validation lane is no longer trusted for ranking.
 - The main remote path is now the `8xH100` submission fleet.
-- The fleet has `3` parallel lanes.
-- Each lane should process a sequential batch of candidates on one warm pod.
+- The current budget policy is `1` warm `8xH100` pod at a time.
+- Pod A is the default first choice and Pod C is the fallback.
+- Queue files A/B/C are logical batches, not a mandate to run three live pods in parallel.
 
 ## Why
 
@@ -34,9 +35,9 @@ So candidate ranking should happen on `8xH100`, not on the old `1xH100` proxy.
 
 - create a new `8xH100` pod:
   - `scripts/create_remote_submission_pod.sh`
-- claim one of the three fleet pods:
+- claim one of the available fleet pods:
   - `scripts/claim_remote_submission_pod.sh`
-- release one of the three fleet pods:
+- release one of the available fleet pods:
   - `scripts/release_remote_submission_pod.sh`
 - single remote submission runner on the pod:
   - `scripts/run_remote_submission_8xh100.sh`
@@ -73,10 +74,12 @@ Reference policy:
 
 Recommended convention:
 
-- put a control or trusted baseline first in each per-pod queue until the shared reference curve exists
+- put a control or trusted baseline first in each queue file until the shared reference curve exists
 - the batch runner forces periodic validation by default with:
   - `VAL_LOSS_EVERY=1500`
   - unless the queue entry already overrides it
+- keep queue A as the next live queue
+- use queue B and queue C only if budget remains after queue A or if the user explicitly approves parallel spend
 
 ## Early-stop defense
 
@@ -97,10 +100,15 @@ Recommended convention:
 
 ## Recommended launch pattern
 
-One local agent per pod:
+Default budget-conscious launch:
 
 ```bash
 bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_a.tsv
+```
+
+Overflow only after queue A completes cleanly and budget remains:
+
+```bash
 bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_b.tsv
 bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_c.tsv
 ```
@@ -133,5 +141,7 @@ A run is valid if:
 - Do not leave idle pods running.
 - Do not multiplex multiple active candidates on the same pod at once.
 - Do batch multiple candidates sequentially on the same warm pod.
+- Do not start a second `8xH100` pod until the current queue has produced useful results or the user explicitly authorizes the extra spend.
 - Push candidate branches before sending them to the remote fleet.
 - If a run looks suspicious, prefer a second `8xH100` confirmation over a long `1xH100` proxy.
+- If setup fails repeatedly, stop the pod and fix the issue locally before spending more `8xH100` minutes.
