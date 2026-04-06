@@ -40,9 +40,11 @@ SSH_OPTS="${SSH_OPTS:-}"
 SSH_PORT="${SSH_PORT:-}"
 REMOTE_VAL_LOSS_EVERY_DEFAULT="${REMOTE_VAL_LOSS_EVERY_DEFAULT:-1500}"
 EARLY_STOP_ENABLE="${EARLY_STOP_ENABLE:-1}"
-EARLY_STOP_FRACTION="${EARLY_STOP_FRACTION:-0.50}"
-EARLY_STOP_MARGIN_BPB="${EARLY_STOP_MARGIN_BPB:-0.0200}"
+EARLY_STOP_FRACTION="${EARLY_STOP_FRACTION:-0.65}"
+EARLY_STOP_MARGIN_BPB="${EARLY_STOP_MARGIN_BPB:-0.0300}"
 EARLY_STOP_LOG_TAIL_LINES="${EARLY_STOP_LOG_TAIL_LINES:-400}"
+EARLY_STOP_MIN_CHECKPOINTS="${EARLY_STOP_MIN_CHECKPOINTS:-2}"
+EARLY_STOP_MIN_IMPROVEMENT_BPB="${EARLY_STOP_MIN_IMPROVEMENT_BPB:-0.0050}"
 SHARED_REFERENCE_CURVE_FILE="${SHARED_REFERENCE_CURVE_FILE:-$ROOT/codex_notes/coordination_live/submission_reference_curve.tsv}"
 QUEUE_REFERENCE_FALLBACK="${QUEUE_REFERENCE_FALLBACK:-1}"
 PROMOTE_QUEUE_REFERENCE_TO_SHARED="${PROMOTE_QUEUE_REFERENCE_TO_SHARED:-0}"
@@ -157,7 +159,9 @@ should_early_stop() {
   local max_wallclock_seconds="$3"
   local fraction="$4"
   local margin_bpb="$5"
-  LOG_TAIL_INPUT="$log_tail" REFERENCE_CURVE_FILE_INPUT="$reference_curve_file" MAX_WALLCLOCK_SECONDS_INPUT="$max_wallclock_seconds" FRACTION_INPUT="$fraction" MARGIN_BPB_INPUT="$margin_bpb" python3 - <<'PY'
+  local min_checkpoints="$6"
+  local min_improvement_bpb="$7"
+  LOG_TAIL_INPUT="$log_tail" REFERENCE_CURVE_FILE_INPUT="$reference_curve_file" MAX_WALLCLOCK_SECONDS_INPUT="$max_wallclock_seconds" FRACTION_INPUT="$fraction" MARGIN_BPB_INPUT="$margin_bpb" MIN_CHECKPOINTS_INPUT="$min_checkpoints" MIN_IMPROVEMENT_BPB_INPUT="$min_improvement_bpb" python3 - <<'PY'
 import os
 import re
 import sys
@@ -168,22 +172,32 @@ reference_curve = Path(os.environ["REFERENCE_CURVE_FILE_INPUT"])
 max_wallclock_seconds = float(os.environ["MAX_WALLCLOCK_SECONDS_INPUT"])
 fraction = float(os.environ["FRACTION_INPUT"])
 margin_bpb = float(os.environ["MARGIN_BPB_INPUT"])
+min_checkpoints = int(os.environ["MIN_CHECKPOINTS_INPUT"])
+min_improvement_bpb = float(os.environ["MIN_IMPROVEMENT_BPB_INPUT"])
 
 pat = re.compile(r"step:(\d+)/(\d+)\s+val_loss:([0-9.]+)\s+val_bpb:([0-9.]+)\s+train_time:(\d+)ms step_avg:([0-9.]+)ms")
-latest = None
+checkpoints = []
 for line in text.splitlines():
     m = pat.search(line)
     if m:
-        latest = {
+        checkpoints.append({
             "step": int(m.group(1)),
             "val_bpb": float(m.group(4)),
             "train_time_ms": int(m.group(5)),
             "step_avg_ms": float(m.group(6)),
-        }
+        })
 
-if latest is None:
+if not checkpoints:
     print("NO_CHECKPOINT")
     sys.exit(0)
+
+if len(checkpoints) < min_checkpoints:
+    print("WAIT")
+    sys.exit(0)
+
+latest = checkpoints[-1]
+previous = checkpoints[-2]
+recent_improvement = previous["val_bpb"] - latest["val_bpb"]
 
 threshold_ms = int(max_wallclock_seconds * fraction * 1000)
 if latest["train_time_ms"] < threshold_ms:
@@ -213,12 +227,14 @@ if not eligible:
 
 ref = eligible[-1]
 delta = latest["val_bpb"] - ref["val_bpb"]
-if delta > margin_bpb:
+if delta > margin_bpb and recent_improvement < min_improvement_bpb:
     print(
         "EARLY_STOP "
         f"candidate_step={latest['step']} "
         f"candidate_train_time_ms={latest['train_time_ms']} "
         f"candidate_val_bpb={latest['val_bpb']:.6f} "
+        f"previous_val_bpb={previous['val_bpb']:.6f} "
+        f"recent_improvement_bpb={recent_improvement:.6f} "
         f"reference_step={ref['step']} "
         f"reference_train_time_ms={ref['train_time_ms']} "
         f"reference_val_bpb={ref['val_bpb']:.6f} "
@@ -230,6 +246,8 @@ else:
         f"candidate_step={latest['step']} "
         f"candidate_train_time_ms={latest['train_time_ms']} "
         f"candidate_val_bpb={latest['val_bpb']:.6f} "
+        f"previous_val_bpb={previous['val_bpb']:.6f} "
+        f"recent_improvement_bpb={recent_improvement:.6f} "
         f"reference_val_bpb={ref['val_bpb']:.6f} "
         f"delta_bpb={delta:.6f}"
     )
@@ -362,7 +380,7 @@ EOF
       break
     fi
     if [[ "$EARLY_STOP_ENABLE" == "1" && -f "$active_reference_curve_file" ]]; then
-      early_stop_decision="$(should_early_stop "$log_tail" "$active_reference_curve_file" "$max_wallclock_seconds" "$EARLY_STOP_FRACTION" "$EARLY_STOP_MARGIN_BPB")"
+      early_stop_decision="$(should_early_stop "$log_tail" "$active_reference_curve_file" "$max_wallclock_seconds" "$EARLY_STOP_FRACTION" "$EARLY_STOP_MARGIN_BPB" "$EARLY_STOP_MIN_CHECKPOINTS" "$EARLY_STOP_MIN_IMPROVEMENT_BPB")"
       if [[ "$early_stop_decision" == EARLY_STOP* ]]; then
         early_stop_reason="$early_stop_decision"
         echo "early stopping $slug: $early_stop_reason"

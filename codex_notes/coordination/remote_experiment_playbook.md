@@ -81,10 +81,14 @@ Recommended convention:
 ## Early-stop defense
 
 - The batch runner now has a budget-defense mode enabled by default.
-- After about `50%` of the configured wallclock budget, a candidate can be stopped early if its latest `val_bpb` checkpoint is clearly behind the active reference curve.
+- After about `65%` of the configured wallclock budget, a candidate can be stopped early only if it is both:
+  - clearly behind the active reference curve
+  - and no longer improving meaningfully on its own recent validation checkpoints
 - Default threshold:
-  - candidate worse than reference by more than `0.0200 val_bpb`
+  - candidate worse than reference by more than `0.0300 val_bpb`
+  - and recent self-improvement below `0.0050 val_bpb`
 - This only activates after a reference curve exists, so the first run in each queue should be a control.
+- It also requires at least `2` validation checkpoints from the candidate itself.
 - Early-stopped runs still get:
   - pulled logs
   - summary file
