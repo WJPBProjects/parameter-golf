@@ -43,12 +43,15 @@ EARLY_STOP_ENABLE="${EARLY_STOP_ENABLE:-1}"
 EARLY_STOP_FRACTION="${EARLY_STOP_FRACTION:-0.50}"
 EARLY_STOP_MARGIN_BPB="${EARLY_STOP_MARGIN_BPB:-0.0200}"
 EARLY_STOP_LOG_TAIL_LINES="${EARLY_STOP_LOG_TAIL_LINES:-400}"
+SHARED_REFERENCE_CURVE_FILE="${SHARED_REFERENCE_CURVE_FILE:-$ROOT/codex_notes/coordination_live/submission_reference_curve.tsv}"
+QUEUE_REFERENCE_FALLBACK="${QUEUE_REFERENCE_FALLBACK:-1}"
+PROMOTE_QUEUE_REFERENCE_TO_SHARED="${PROMOTE_QUEUE_REFERENCE_TO_SHARED:-0}"
 
 STAMP="${STAMP:-$(date +%Y%m%d_%H%M%S)}"
 BATCH_NAME="${BATCH_NAME:-$(basename "$QUEUE_FILE" | sed 's/\.[^.]*$//')}"
 RESULT_DIR="${LOCAL_RESULTS_ROOT}/${STAMP}_${BATCH_NAME}"
 mkdir -p "$RESULT_DIR"
-REFERENCE_CURVE_FILE="${REFERENCE_CURVE_FILE:-$RESULT_DIR/reference_curve.tsv}"
+QUEUE_REFERENCE_CURVE_FILE="$RESULT_DIR/reference_curve.tsv"
 
 AUTO_CLAIMED_POD_ID=""
 
@@ -309,7 +312,12 @@ run_one() {
   local run_id="submission8x_${slug}_$(date +%Y%m%d_%H%M%S)"
   local case_dir="$RESULT_DIR/$slug"
   local case_curve_file="$case_dir/validation_curve.tsv"
+  local active_reference_curve_file="$SHARED_REFERENCE_CURVE_FILE"
   mkdir -p "$case_dir"
+
+  if [[ ! -f "$active_reference_curve_file" ]]; then
+    active_reference_curve_file="$QUEUE_REFERENCE_CURVE_FILE"
+  fi
 
   effective_extra_env="$(augment_extra_env "$extra_env")"
   max_wallclock_seconds="$(resolve_env_value "$effective_extra_env" MAX_WALLCLOCK_SECONDS 600)"
@@ -353,8 +361,8 @@ EOF
       final_detected=1
       break
     fi
-    if [[ "$EARLY_STOP_ENABLE" == "1" && -f "$REFERENCE_CURVE_FILE" ]]; then
-      early_stop_decision="$(should_early_stop "$log_tail" "$REFERENCE_CURVE_FILE" "$max_wallclock_seconds" "$EARLY_STOP_FRACTION" "$EARLY_STOP_MARGIN_BPB")"
+    if [[ "$EARLY_STOP_ENABLE" == "1" && -f "$active_reference_curve_file" ]]; then
+      early_stop_decision="$(should_early_stop "$log_tail" "$active_reference_curve_file" "$max_wallclock_seconds" "$EARLY_STOP_FRACTION" "$EARLY_STOP_MARGIN_BPB")"
       if [[ "$early_stop_decision" == EARLY_STOP* ]]; then
         early_stop_reason="$early_stop_decision"
         echo "early stopping $slug: $early_stop_reason"
@@ -378,9 +386,16 @@ EOF
   fi
   SSH_PORT="$SSH_PORT" bash "$ROOT/scripts/pull_remote_run_artifacts.sh" "$TARGET" "$run_id" "$case_dir"
   extract_validation_curve "$case_dir/logs/${run_id}.txt" "$case_curve_file"
-  if [[ ! -f "$REFERENCE_CURVE_FILE" && -f "$case_curve_file" && $(wc -l <"$case_curve_file") -gt 1 ]]; then
-    cp "$case_curve_file" "$REFERENCE_CURVE_FILE"
-    echo "captured reference curve from $slug -> $REFERENCE_CURVE_FILE"
+  if [[ -f "$case_curve_file" && $(wc -l <"$case_curve_file") -gt 1 ]]; then
+    if [[ ! -f "$SHARED_REFERENCE_CURVE_FILE" && "$QUEUE_REFERENCE_FALLBACK" == "1" && ! -f "$QUEUE_REFERENCE_CURVE_FILE" ]]; then
+      cp "$case_curve_file" "$QUEUE_REFERENCE_CURVE_FILE"
+      echo "captured queue fallback reference from $slug -> $QUEUE_REFERENCE_CURVE_FILE"
+      if [[ "$PROMOTE_QUEUE_REFERENCE_TO_SHARED" == "1" ]]; then
+        mkdir -p "$(dirname "$SHARED_REFERENCE_CURVE_FILE")"
+        cp "$case_curve_file" "$SHARED_REFERENCE_CURVE_FILE"
+        echo "promoted queue reference from $slug -> $SHARED_REFERENCE_CURVE_FILE"
+      fi
+    fi
   fi
 }
 

@@ -1,4 +1,4 @@
 # Pod A queue
 # Format:
 # slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
-# Put a control or trusted baseline first.
+# If no shared submission_reference_curve.tsv exists yet, put a control or trusted baseline first.
