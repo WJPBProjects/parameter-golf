@@ -28,8 +28,8 @@ ssh_ready() {
 
 POD_IDS=(
   "bg36rohzqz8svz"
-  "p0q5f3wenzygvr"
   "h91bgyz08fp9dk"
+  "p0q5f3wenzygvr"
 )
 
 cleanup_claim() {

@@ -31,6 +31,7 @@ This file tracks the active remote fleet for this repo.
   - `8x NVIDIA H100 80GB HBM3`
 - State intent:
   - stopped until claimed
+  - deprioritized after two `Exited by RunPod` events during setup on `2026-04-06`
 
 ### Pod C
 
