@@ -177,6 +177,10 @@ else
   git switch -C "$BRANCH_NAME" --track "origin/$BRANCH_NAME" >/dev/null 2>&1 || git switch "$BRANCH_NAME"
 fi
 
+# Previous stage outputs are disposable and should not block the next stage.
+rm -rf artifacts
+rm -f final_model.pt final_model.int8.ptz
+
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "remote repo became dirty before stage run" >&2
   exit 1

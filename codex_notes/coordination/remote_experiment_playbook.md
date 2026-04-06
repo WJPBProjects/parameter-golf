@@ -234,6 +234,7 @@ Important:
 
 - `logs/` and `artifacts/` are disposable run outputs and are intentionally ignored by git
 - a remote repo that only contains ignored outputs is still considered clean enough for the next stage
+- the stage runner also deletes disposable `artifacts/` and leftover `final_model*` files before each new stage switch, so old branch snapshots do not block the next branch checkout
 
 ## Validation-pod guard rails
 
