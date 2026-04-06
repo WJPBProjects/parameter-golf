@@ -1,6 +1,6 @@
 # Active Run Status
 
-Last updated: 2026-04-06 22:05 UTC
+Last updated: 2026-04-06 22:24 UTC
 
 ## Current execution
 
@@ -78,15 +78,29 @@ Submission-lane calibration:
    - prefer Pod A
    - use Pod C only as fallback
 3. run queue A first:
-   - `compile-safe-late-qat`
    - `late-value-embed-qk5`
+   - `embedding-skip-parallel-late`
 4. only if queue A completes cleanly and budget remains, run queue B:
    - `parallelres-qkgain5`
+   - `compile-safe-late-qat`
 5. only if budget still remains, run queue C:
    - `late-value-embed-legal-ttt`
-   - `embedding-skip-parallel-late`
 6. keep the pod warm only while its current queue is active, and stop immediately after
 7. do not spend paid `8xH100` time on repeated setup debugging; stop and fix locally first
+
+## Latest local preflight before resumed spend
+
+- `late-value-embed-qk5`:
+  - `py_compile` passed for CUDA and MLX trainer copies
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
+- `embedding-skip-parallel-late`:
+  - `py_compile` passed for CUDA and MLX trainer copies
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
+- `compile-safe-late-qat`, `parallelres-qkgain5`, and `xsa-all`:
+  - `py_compile` passed for CUDA and MLX trainer copies
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
+- Caveat:
+  - some branches do not have MLX implementations for their remote-only features, so a local MLX run would not validate the actual remote hypothesis
 
 ## Billing rule
 

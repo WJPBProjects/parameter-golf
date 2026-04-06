@@ -31,6 +31,8 @@
 
 - `py_compile` passed for both trainer copies on `2026-04-06`.
 - Local CPU import + model-instantiation + forward-pass preflight passed on `2026-04-06`.
+- Local MLX runner smoke passed on `2026-04-06`:
+  - `/Users/wulfie/code/parameter-golf-worktrees/late-value-embed-qk5/logs/preflight_late_value_embed_qk5_20260406_215133.txt`
 - This is one of the first original candidates selected for the next `8xH100` queue.
 
 ## Local Screening
@@ -38,6 +40,7 @@
 - Status: PASS
 - Notes:
   - Preflight only; no MLX metric is trusted here because the MLX copy does not reflect the remote mechanism well enough for ranking.
+  - Latest smoke proved the branch-local MLX path, data, tokenizer, logging, and artifact paths still work.
 
 ## Promotion Decision
 

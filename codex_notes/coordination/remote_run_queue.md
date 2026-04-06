@@ -38,14 +38,19 @@ When preparing a real batch:
 
 ## Candidates worth considering first
 
+- `late-value-embed-qk5`
+  - original value-path candidate; clean syntax and tiny CPU PyTorch forward preflight on `2026-04-06`
+- `embedding-skip-parallel-late`
+  - original embedding-reuse candidate; clean syntax and tiny CPU PyTorch forward preflight on `2026-04-06`
+- `parallelres-qkgain5`
+  - lower-novelty fallback with prior local signal
 - `compile-safe-late-qat`
-  - CUDA-only path
-- `xsa-all`
-  - modest local positive and simple implementation
+  - CUDA-only fallback; do not run before the cleaner original queue A branches
 
 ## Candidates not worth spending `8xH100` time on right now
 
 - stale local-only value-path family branches
+- straight public-PR controls unless used as diagnostics
 - `GPTQ self calibration`
 - `Selective post-GPTQ pruning`
 - `RoPE + LN-scale grid`

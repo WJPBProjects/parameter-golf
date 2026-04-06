@@ -30,6 +30,8 @@
 
 - `py_compile` passed for both trainer copies on `2026-04-06`.
 - Local CPU import + model-instantiation + forward-pass preflight passed on `2026-04-06`.
+- Local MLX runner smoke passed on `2026-04-06`:
+  - `/Users/wulfie/code/parameter-golf-worktrees/embedding-skip-parallel-late/logs/preflight_embedding_skip_parallel_late_20260406_215152.txt`
 - Selected as the second original candidate for the next `8xH100` queue.
 
 ## Local Screening
@@ -37,6 +39,7 @@
 - Status: PASS
 - Notes:
   - Preflight only; no MLX score is being treated as meaningful for this branch.
+  - Latest smoke proved the branch-local MLX path, data, tokenizer, logging, and artifact paths still work.
 
 ## Promotion Decision
 
