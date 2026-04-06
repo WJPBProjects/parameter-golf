@@ -62,6 +62,27 @@ compile-safe-late-qat	codex/compile-safe-late-qat	experiments/compile-safe-late-
 xsa-all	codex/xsa-all	experiments/xsa-all/train_gpt.py	
 ```
 
+Recommended convention:
+
+- put a control or trusted baseline first in each per-pod queue
+- later candidates in that same queue will be compared against that first run's mid-run validation curve
+- the batch runner forces periodic validation by default with:
+  - `VAL_LOSS_EVERY=1500`
+  - unless the queue entry already overrides it
+
+## Early-stop defense
+
+- The batch runner now has a budget-defense mode enabled by default.
+- After about `50%` of the configured wallclock budget, a candidate can be stopped early if its latest `val_bpb` checkpoint is clearly behind the queue's reference curve.
+- Default threshold:
+  - candidate worse than reference by more than `0.0200 val_bpb`
+- This only activates after a reference curve exists, so the first run in each queue should be a control.
+- Early-stopped runs still get:
+  - pulled logs
+  - summary file
+  - any artifacts that exist
+  - recorded status
+
 ## Recommended launch pattern
 
 One local agent per pod:
