@@ -1,75 +1,90 @@
 # Remote Pod Inventory
 
-This file tracks the current RunPod fleet that is relevant to this repo.
+This file tracks the active remote fleet for this repo.
 
 ## Fleet policy
 
-- Stage 3 validation:
-  - up to `3` parallel `1xH100` pods
-- Stage 4 submission:
-  - exactly one `8xH100` lane
-- Do not leave idle pods running.
+- The `1xH100` validation fleet has been retired.
+- The primary ranking lane is now a `3`-pod `8xH100` fleet.
+- Keep all pods stopped unless they are actively serving a batch.
 
-## Current known pods
+## Current `8xH100` fleet
 
-### Active calibration pod
+### Pod A
 
 - RunPod name:
-  - `parameter-golf-validation-calibration-1`
+  - `parameter-golf-8xh100-calibration-1`
 - Pod id:
-  - `yupx86fgiyv4ad`
+  - `bg36rohzqz8svz`
 - Shape:
-  - `1x NVIDIA H100 80GB HBM3`
-- Image:
-  - `runpod/parameter-golf:latest`
-- Current use:
-  - same-pod baseline + exact merged-record calibration run
+  - `8x NVIDIA H100 80GB HBM3`
+- State intent:
+  - stopped until claimed
 
-### Submission pod
+### Pod B
 
+- RunPod name:
+  - `parameter-golf-8xh100-calibration-2`
 - Pod id:
-  - `slc7ozmtif62ih`
-- Intended use:
-  - true `8xH100` submission-style run only
-- Policy:
-  - keep stopped unless explicitly needed
+  - `p0q5f3wenzygvr`
+- Shape:
+  - `8x NVIDIA H100 80GB HBM3`
+- State intent:
+  - stopped until claimed
 
-## Important note
+### Pod C
 
-The older A/B/C validation inventory is no longer authoritative.
+- RunPod name:
+  - `parameter-golf-8xh100-calibration-3`
+- Pod id:
+  - `h91bgyz08fp9dk`
+- Shape:
+  - `8x NVIDIA H100 80GB HBM3`
+- State intent:
+  - stopped until claimed
 
-Do not assume those pod ids still exist. Check live state first with:
+## Deleted fleet
+
+These pods were intentionally removed and should no longer be used:
+
+- `yupx86fgiyv4ad`
+- `untjvs1cx2gq4u`
+- `2ollt57dzbud46`
+- `94x77u15s3v7s2`
+- `slc7ozmtif62ih`
+
+## Lifecycle commands
+
+Check live state:
 
 ```bash
 runpodctl pod list --output=json
-runpodctl pod get <pod-id> --output=json
-runpodctl ssh info <pod-id>
+runpodctl pod get bg36rohzqz8svz --output=json
+runpodctl pod get p0q5f3wenzygvr --output=json
+runpodctl pod get h91bgyz08fp9dk --output=json
 ```
 
-## Lifecycle rule
+Automatic claim:
 
-For an active batch:
+```bash
+bash scripts/claim_remote_submission_pod.sh main-agent
+```
 
-1. start or create only the pod(s) you need
-2. run baseline first
-3. run the exact merged-record control
-4. run the promoted candidate(s)
-5. pull back logs and artifacts after each run
-6. stop the pod when the batch is done
+Automatic release:
 
-## Suggested assignment
+```bash
+bash scripts/release_remote_submission_pod.sh bg36rohzqz8svz
+```
 
-When multiple validation pods exist:
+## Batch assignment model
 
-- Pod 1:
-  - baseline
-  - exact merged-record control
-  - candidate A
-- Pod 2:
-  - baseline
-  - exact merged-record control
-  - candidate B
-- Pod 3:
-  - baseline
-  - exact merged-record control
-  - candidate C
+During a real run:
+
+- Pod A:
+  - candidate batch A
+- Pod B:
+  - candidate batch B
+- Pod C:
+  - candidate batch C
+
+Each pod should stay warm for its own sequential batch, then be stopped immediately.

@@ -59,7 +59,8 @@ META_PATH="logs/${RUN_ID}.remote.meta.txt"
 SUMMARY_PATH="logs/${RUN_ID}.summary.txt"
 ARTIFACT_DIR="artifacts/${RUN_ID}"
 MODEL_PT_SRC="final_model.pt"
-MODEL_PTZ_SRC="final_model.int8.ptz"
+MODEL_PTZ_INT8_SRC="final_model.int8.ptz"
+MODEL_PTZ_INT6_SRC="final_model.int6.ptz"
 STATUS="FAILED"
 
 cat >"$META_PATH" <<EOF
@@ -104,7 +105,7 @@ fi
   echo "finished_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "log_path=$LOG_PATH"
   if [[ -f "$LOG_PATH" ]]; then
-    grep -E "world_size:|final_int8_zlib_roundtrip|serialized_model_int8_zlib|step_avg:|stopping_early:" "$LOG_PATH" | tail -n 16 || true
+    grep -E "world_size:|final_int(6|8)_roundtrip|Serialized model int(6|8)\+zlib|Total submission size int(6|8)\+zlib|step_avg:|stopping_early:" "$LOG_PATH" | tail -n 20 || true
   else
     echo "log_missing=1"
   fi
@@ -115,9 +116,13 @@ if [[ -f "$MODEL_PT_SRC" ]]; then
   mv -f "$MODEL_PT_SRC" "$ARTIFACT_DIR/final_model.pt"
   echo "artifact_model_pt=$ARTIFACT_DIR/final_model.pt" >>"$SUMMARY_PATH"
 fi
-if [[ -f "$MODEL_PTZ_SRC" ]]; then
-  mv -f "$MODEL_PTZ_SRC" "$ARTIFACT_DIR/final_model.int8.ptz"
+if [[ -f "$MODEL_PTZ_INT8_SRC" ]]; then
+  mv -f "$MODEL_PTZ_INT8_SRC" "$ARTIFACT_DIR/final_model.int8.ptz"
   echo "artifact_model_ptz=$ARTIFACT_DIR/final_model.int8.ptz" >>"$SUMMARY_PATH"
+fi
+if [[ -f "$MODEL_PTZ_INT6_SRC" ]]; then
+  mv -f "$MODEL_PTZ_INT6_SRC" "$ARTIFACT_DIR/final_model.int6.ptz"
+  echo "artifact_model_ptz=$ARTIFACT_DIR/final_model.int6.ptz" >>"$SUMMARY_PATH"
 fi
 
 cat "$SUMMARY_PATH"

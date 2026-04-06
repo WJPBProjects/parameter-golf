@@ -1,11 +1,11 @@
 # Active Run Status
 
-Last updated: 2026-04-06 17:27 UTC
+Last updated: 2026-04-06 20:45 UTC
 
 ## Current execution
 
 - Active wave: `PAUSED`
-- Profile: `remote merged-record calibration complete`
+- Profile: `8xH100 fleet prepared for batch ranking`
 - Current pod:
   - `none`
 - Current experiment:
@@ -41,18 +41,23 @@ Submission-lane calibration:
   - the exact record behaves sensibly on the real submission lane
   - the broken piece is the `1xH100` proxy, not the overall remote setup
 
-## Current result directory
+## Current result directories
 
 - `/Users/wulfie/code/parameter-golf/remote_results/20260406_171426_merged_record_signalrush`
+- `/Users/wulfie/code/parameter-golf/remote_results/20260406_180723_submission_record_signalrush`
 
 ## Next actions after this run
 
-1. stop treating the current `1xH100` lane as a leaderboard-ranking proxy
-2. use `8xH100` for decisive ranking when it matters
-3. if a cheaper proxy is still desired, recalibrate a new one explicitly against this successful `8xH100` result
-4. only then resume candidate fishing on cheaper remote hardware
+1. fill the per-pod batch queue files:
+   - `codex_notes/coordination/submission_batch_queue_a.tsv`
+   - `codex_notes/coordination/submission_batch_queue_b.tsv`
+   - `codex_notes/coordination/submission_batch_queue_c.tsv`
+2. launch up to `3` parallel `8xH100` batch runners
+3. keep each pod warm only for its own queue
+4. stop and release each pod immediately after its queue finishes
 
 ## Billing rule
 
 - no other pods should be left running unless they are actively serving the current batch
-- all calibration pods have been stopped
+- all `1xH100` validation pods have been deleted
+- all `8xH100` fleet pods are currently stopped

@@ -69,6 +69,15 @@ Current seed file:
   - remote promotion only for ideas that clear the local bar
 - Treat existing public PR implementations as controls or inspirations, not as final submission targets.
 - Do not spend the true `8xH100` submission lane on a straight reimplementation of an existing PR.
+- The old `1xH100` validation fleet is retired for candidate ranking.
+- Remote ranking should happen on the `3`-pod `8xH100` fleet.
+- One remote agent/process should own one `8xH100` pod at a time.
+- Prefer the submission batch runner for remote ranking:
+  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_a.tsv`
+  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_b.tsv`
+  - `bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_c.tsv`
+- The submission batch runner will claim and release one pod automatically.
+- Keep each claimed `8xH100` pod warm only for its own sequential batch, then stop it.
 - Submission-stage candidates should contain a meaningfully novel contribution from this repo:
   - a new composition across ideas
   - a new extension or ablation-backed variant

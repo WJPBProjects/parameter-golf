@@ -78,6 +78,7 @@ copy_required "logs/${RUN_ID}.txt" "$LOCAL_DEST_DIR/logs/${RUN_ID}.txt"
 copy_required "logs/${RUN_ID}.remote.meta.txt" "$LOCAL_DEST_DIR/logs/${RUN_ID}.remote.meta.txt"
 copy_required "logs/${RUN_ID}.summary.txt" "$LOCAL_DEST_DIR/logs/${RUN_ID}.summary.txt"
 copy_optional "artifacts/${RUN_ID}/final_model.int8.ptz" "$LOCAL_DEST_DIR/artifacts/final_model.int8.ptz"
+copy_optional "artifacts/${RUN_ID}/final_model.int6.ptz" "$LOCAL_DEST_DIR/artifacts/final_model.int6.ptz"
 copy_optional "artifacts/${RUN_ID}/final_model.pt" "$LOCAL_DEST_DIR/artifacts/final_model.pt"
 
 cat >"$LOCAL_DEST_DIR/pull.meta.txt" <<EOF

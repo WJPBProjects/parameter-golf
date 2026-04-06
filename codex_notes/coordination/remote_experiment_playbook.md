@@ -1,192 +1,104 @@
 # Remote Experiment Playbook
 
-This file is the operator README for promoted CUDA runs.
+This is the operator README for remote ranking runs.
 
 Use it together with:
 
-- `codex_notes/coordination_live/experiment_board.md`
 - `codex_notes/coordination_live/remote_pod_inventory.md`
-- `codex_notes/coordination_live/promotion_rubric.md`
 - `codex_notes/coordination_live/remote_run_queue.md`
+- `codex_notes/coordination_live/submission_batch_queue.tsv`
+- `codex_notes/coordination_live/submission_batch_queue_a.tsv`
+- `codex_notes/coordination_live/submission_batch_queue_b.tsv`
+- `codex_notes/coordination_live/submission_batch_queue_c.tsv`
+- `codex_notes/coordination_live/promotion_rubric.md`
 
-## Goal
+## Current policy
 
-Run promoted experiments on remote CUDA machines in a way that is:
+- The old `1xH100` validation lane is no longer trusted for ranking.
+- The main remote path is now the `8xH100` submission fleet.
+- The fleet has `3` parallel lanes.
+- Each lane should process a sequential batch of candidates on one warm pod.
 
-- comparable across experiments
-- restart-safe
-- easy to audit afterward
+## Why
 
-## Current calibration policy
+We calibrated the exact merged leaderboard record in both regimes:
 
-Do not use a partial public-PR port as the default remote control.
+- `1xH100` stage-3 proxy:
+  - misleading
+- `8xH100` true lane:
+  - directionally correct
 
-The default same-pod control is now the exact merged record:
+So candidate ranking should happen on `8xH100`, not on the old `1xH100` proxy.
 
-- `records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py`
+## Core scripts
 
-Reason:
-
-- it is merged
-- it is valid
-- it is reproducible from `main`
-- it gives a cleaner remote calibration target than an approximate branch port
-
-## Promotion ladder
-
-1. local screen
-2. local confirm
-3. remote validation on cheaper CUDA, usually `1xH100`
-4. true submission-style remote run on `8xH100 SXM`
-
-## Concurrency policy
-
-- Stage 3 validation may use up to `3` concurrent `1xH100` pods.
-- Stage 4 is single-lane only.
-- Keep submission pods stopped unless actively needed.
-
-## Standard stage-3 sequence
-
-For each fresh validation pod or major code refresh:
-
-1. same-pod baseline
-2. same-pod exact merged-record control
-3. one or more promoted candidates
-4. extra seeds only for candidates that still look promising remotely
-
-Do not evaluate a candidate without a fresh same-pod baseline first.
-
-## Standard scripts
-
-- stage-3 runner:
-  - `scripts/run_remote_experiment.sh`
-- artifact pullback:
-  - `scripts/pull_remote_run_artifacts.sh`
-- local queue helper:
-  - `scripts/run_remote_validation_sequence.sh`
-- automatic pod claim:
-  - `scripts/claim_remote_validation_pod.sh`
-- automatic pod release:
-  - `scripts/release_remote_validation_pod.sh`
-- stage-4 runner:
+- create a new `8xH100` pod:
+  - `scripts/create_remote_submission_pod.sh`
+- claim one of the three fleet pods:
+  - `scripts/claim_remote_submission_pod.sh`
+- release one of the three fleet pods:
+  - `scripts/release_remote_submission_pod.sh`
+- single remote submission runner on the pod:
   - `scripts/run_remote_submission_8xh100.sh`
+- local artifact pullback:
+  - `scripts/pull_remote_run_artifacts.sh`
+- local batch driver:
+  - `scripts/run_remote_submission_batch.sh`
 
-## What counts as a valid remote result
+## Queue format
 
-A remote result is only valid if all of the following are true:
+The batch driver reads:
 
-- `logs/<RUN_ID>.txt` exists
-- the log contains `final_int8_zlib_roundtrip_exact`
-- the log contains `serialized_model_int8_zlib`
-- the compared runs were executed on the same pod session
-- the recorded trainer path matches the intended script
+- `codex_notes/coordination_live/submission_batch_queue.tsv`
 
-If any of those are missing, mark the run `BLOCKED` or `FAIL`, not `DONE`.
+Format:
 
-## Pod bootstrap
+- `slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)`
 
-On a fresh pod:
+Example:
 
-```bash
-cd /workspace
-git clone https://github.com/openai/parameter-golf.git
-cd parameter-golf
-python3 data/cached_challenge_fineweb.py --variant sp1024
+```text
+compile-safe-late-qat	codex/compile-safe-late-qat	experiments/compile-safe-late-qat/train_gpt.py	QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15
+xsa-all	codex/xsa-all	experiments/xsa-all/train_gpt.py	
 ```
 
-If the experiment is on a non-`main` branch, push it locally and fetch it remotely before running.
+## Recommended launch pattern
 
-## Standard runner examples
-
-Baseline:
+One local agent per pod:
 
 ```bash
-bash scripts/run_remote_experiment.sh baseline train_gpt.py
+bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_a.tsv
+bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_b.tsv
+bash scripts/run_remote_submission_batch.sh auto codex_notes/coordination/submission_batch_queue_c.tsv
 ```
 
-Merged-record control:
+The batch runner will:
 
-```bash
-bash scripts/run_remote_experiment.sh \
-  merged-record-signalrush \
-  records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py
-```
+1. claim a stopped `8xH100` pod
+2. start it
+3. bootstrap the repo from the local `origin` remote
+4. bootstrap data if needed
+5. push/fetch the requested branch
+6. run the candidate
+7. monitor the remote log until the final quantized metric appears
+8. finalize artifacts even if the remote wrapper hangs
+9. pull logs and artifacts back locally
+10. stop and release the pod by default
 
-Candidate:
+## What counts as a valid ranked result
 
-```bash
-bash scripts/run_remote_experiment.sh \
-  compile-safe-late-qat \
-  experiments/compile-safe-late-qat/train_gpt.py
-```
+A run is valid if:
 
-## Queue helper
+- the log exists locally
+- the final quantized exact metric exists locally
+- the artifact exists locally
+- the branch/script/run id are recorded
+- the pod is stopped after the batch
 
-The local helper can run baseline -> merged-record control -> candidate in one pass:
+## Operational rules
 
-```bash
-bash scripts/run_remote_validation_sequence.sh \
-  auto \
-  compile-safe-late-qat \
-  codex/compile-safe-late-qat \
-  experiments/compile-safe-late-qat/train_gpt.py
-```
-
-It will:
-
-- claim a stopped validation pod
-- start it
-- resolve the live SSH endpoint
-- bootstrap repo and data if needed
-- run the three-stage sequence
-- pull back logs and artifacts into `remote_results/`
-- stop and release the pod by default
-
-## Restart-safe resume
-
-If a laptop restart interrupts a sequence, resume from `control` or `candidate`:
-
-```bash
-START_STAGE=control \
-SKIP_REMOTE_SETUP=1 \
-BASELINE_RUN_ID=remote_compile-safe-late-qat_baseline_20260406_153725 \
-bash scripts/run_remote_validation_sequence.sh \
-  root@<ip> \
-  compile-safe-late-qat \
-  codex/compile-safe-late-qat \
-  experiments/compile-safe-late-qat/train_gpt.py
-```
-
-Use:
-
-- `START_STAGE=control` to skip baseline
-- `START_STAGE=candidate` to skip baseline and control
-- `BASELINE_RUN_ID=...` and `CONTROL_RUN_ID=...` to pull already-finished outputs into the local result directory
-
-## Validation-pod guard rails
-
-The normal stage-3 flow is:
-
-1. claim a pod
-2. only claim pods whose RunPod status is `EXITED`
-3. treat already-running pods as busy
-4. release and stop them after the batch
-
-This is safe for multiple local agents on this machine and conservative against pods started elsewhere.
-
-## Artifact pullback
-
-After each remote run, pull back at least:
-
-- `logs/<RUN_ID>.txt`
-- `logs/<RUN_ID>.remote.meta.txt`
-- `logs/<RUN_ID>.summary.txt`
-- `artifacts/<RUN_ID>/final_model.int8.ptz`
-
-For serious runs, also pull back:
-
-- `artifacts/<RUN_ID>/final_model.pt`
-
-## Practical rule
-
-Keep one validation pod warm for an active batch. Do not create a fresh pod per candidate unless capacity forces it.
+- Do not leave idle pods running.
+- Do not multiplex multiple active candidates on the same pod at once.
+- Do batch multiple candidates sequentially on the same warm pod.
+- Push candidate branches before sending them to the remote fleet.
+- If a run looks suspicious, prefer a second `8xH100` confirmation over a long `1xH100` proxy.

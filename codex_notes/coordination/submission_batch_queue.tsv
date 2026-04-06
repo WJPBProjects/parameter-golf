@@ -1,0 +1,11 @@
+# Generic queue template
+# Copy entries into the per-pod queue files below for a real batch:
+# - codex_notes/coordination/submission_batch_queue_a.tsv
+# - codex_notes/coordination/submission_batch_queue_b.tsv
+# - codex_notes/coordination/submission_batch_queue_c.tsv
+#
+# Format:
+# slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
+#
+# Example:
+# merged-record-signalrush	main	records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py	
