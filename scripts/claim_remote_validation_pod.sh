@@ -21,6 +21,8 @@ fi
 ssh_ready() {
   local ip="$1"
   local port="$2"
+  ssh "${SSH_READY_OPTS[@]}" -p "$port" "root@$ip" 'exit 0' >/dev/null 2>&1 || return 1
+  sleep 2
   ssh "${SSH_READY_OPTS[@]}" -p "$port" "root@$ip" 'exit 0' >/dev/null 2>&1
 }
 
