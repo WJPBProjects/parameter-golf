@@ -8,82 +8,84 @@ Use it together with:
 - `codex_notes/coordination_live/remote_pod_inventory.md`
 - `codex_notes/coordination_live/promotion_rubric.md`
 - `codex_notes/coordination_live/remote_run_queue.md`
-- the experiment's own scratchpad
 
 ## Goal
 
-Run promoted experiments on a remote CUDA box in a way that is:
+Run promoted experiments on remote CUDA machines in a way that is:
 
 - comparable across experiments
-- easy for another agent to resume
-- easy to judge after the fact
+- restart-safe
+- easy to audit afterward
 
-## Concurrency policy
+## Current calibration policy
 
-- Stage 3 remote validation may use up to `3` concurrent `1xH100` pods.
-- Those three pods are the normal validation fleet recorded in `remote_pod_inventory.md`.
-- Stage 4 true submission runs on `8xH100` are single-lane only.
-- Run at most `one` `8xH100` submission job at a time.
-- Do not launch a second `8xH100` submission pod or a second submission-stage job in parallel unless the user explicitly asks for it.
+Do not use a partial public-PR port as the default remote control.
+
+The default same-pod control is now the exact merged record:
+
+- `records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py`
+
+Reason:
+
+- it is merged
+- it is valid
+- it is reproducible from `main`
+- it gives a cleaner remote calibration target than an approximate branch port
 
 ## Promotion ladder
-
-The intended four-stage flow in this repo is:
 
 1. local screen
 2. local confirm
 3. remote validation on cheaper CUDA, usually `1xH100`
 4. true submission-style remote run on `8xH100 SXM`
 
-Current scripts:
+## Concurrency policy
 
-- local screen:
-  - `scripts/run_local_screen_mlx.sh`
-- local confirm:
-  - `scripts/run_local_confirm_mlx.sh`
-- optional deeper local pass:
-  - `scripts/run_local_overnight_mlx.sh`
-- remote validation:
-  - `scripts/run_remote_experiment.sh`
-- local helper to pull a finished remote run back to this machine:
-  - `scripts/pull_remote_run_artifacts.sh`
-- local helper to drive a stage-3 baseline/control/candidate sequence over SSH:
-  - `scripts/run_remote_validation_sequence.sh`
-- automatic validation-pod claim helper with local locks:
-  - `scripts/claim_remote_validation_pod.sh`
-- automatic validation-pod release helper:
-  - `scripts/release_remote_validation_pod.sh`
-- true `8xH100` submission-style run:
-  - `scripts/run_remote_submission_8xh100.sh`
-- helper to create the `8xH100` RunPod:
-  - `scripts/create_remote_submission_pod.sh`
+- Stage 3 validation may use up to `3` concurrent `1xH100` pods.
+- Stage 4 is single-lane only.
+- Keep submission pods stopped unless actively needed.
 
-## Default remote sequence
+## Standard stage-3 sequence
 
-For each new pod or major code refresh, run in this order:
+For each fresh validation pod or major code refresh:
 
-1. same-pod baseline sanity run
-2. same-pod positive control run
-3. top promoted candidate(s)
+1. same-pod baseline
+2. same-pod exact merged-record control
+3. one or more promoted candidates
 4. extra seeds only for candidates that still look promising remotely
 
-Do not jump straight to a candidate branch without a fresh baseline on the same pod.
+Do not evaluate a candidate without a fresh same-pod baseline first.
+
+## Standard scripts
+
+- stage-3 runner:
+  - `scripts/run_remote_experiment.sh`
+- artifact pullback:
+  - `scripts/pull_remote_run_artifacts.sh`
+- local queue helper:
+  - `scripts/run_remote_validation_sequence.sh`
+- automatic pod claim:
+  - `scripts/claim_remote_validation_pod.sh`
+- automatic pod release:
+  - `scripts/release_remote_validation_pod.sh`
+- stage-4 runner:
+  - `scripts/run_remote_submission_8xh100.sh`
 
 ## What counts as a valid remote result
 
-A remote run is only considered complete if all of these are true:
+A remote result is only valid if all of the following are true:
 
 - `logs/<RUN_ID>.txt` exists
 - the log contains `final_int8_zlib_roundtrip_exact`
 - the log contains `serialized_model_int8_zlib`
-- the startup config matches the intended branch and trainer path
-- the run is compared against a same-pod baseline, not only an older local MLX result
+- the compared runs were executed on the same pod session
+- the recorded trainer path matches the intended script
 
-If any of those are missing, mark the remote run `BLOCKED` or `FAIL`, not `DONE`.
+If any of those are missing, mark the run `BLOCKED` or `FAIL`, not `DONE`.
 
-## Standard pod setup
+## Pod bootstrap
 
-From the pod, for a brand new ephemeral machine:
+On a fresh pod:
 
 ```bash
 cd /workspace
@@ -92,219 +94,9 @@ cd parameter-golf
 python3 data/cached_challenge_fineweb.py --variant sp1024
 ```
 
-If the promoted experiment lives on a non-default branch, get that branch onto the pod before running it.
+If the experiment is on a non-`main` branch, push it locally and fetch it remotely before running.
 
-Preferred path:
-
-1. push the experiment branch from the local machine
-2. fetch it on the pod
-3. run the experiment-local trainer copy from that branch
-
-Example from the local machine:
-
-```bash
-cd /Users/wulfie/code/parameter-golf-worktrees/pr824-kgiir-lite
-git status
-git push -u origin codex/pr824-kgiir-lite
-```
-
-Example from the pod:
-
-```bash
-cd /workspace/parameter-golf
-git fetch origin
-git fetch origin codex/pr824-kgiir-lite
-git switch -C codex/pr824-kgiir-lite --track origin/codex/pr824-kgiir-lite
-```
-
-Repeat the same pattern for any other promoted branch.
-
-## SSH prerequisite
-
-To actually execute remote runs from this machine, the operator must provide a working SSH target for each pod.
-
-Recommended shape:
-
-- create `~/.ssh/config` aliases such as:
-  - `runpod-pg-a`
-  - `runpod-pg-b`
-  - `runpod-pg-c`
-  - `runpod-pg-8x`
-- each alias should include:
-  - host
-  - port
-  - user `root`
-  - the correct `IdentityFile`
-
-Then scripts in this repo can use a stable target like:
-
-```bash
-ssh runpod-pg-a
-```
-
-Do not paste private keys or API tokens into repo notes or chat.
-
-If `runpodctl ssh info <pod-id>` is working, the local queue helper can now avoid a manual alias entirely by using `auto` mode.
-
-The queue helper also attempts to resolve the matching private key automatically by comparing:
-
-- `runpodctl ssh list-keys`
-- local `~/.ssh/*.pub` fingerprints
-
-in `scripts/resolve_runpod_ssh_key.sh`.
-
-## Standard runner
-
-Use the wrapper script so remote runs produce a consistent `RUN_ID`, metadata file, and summary file:
-
-```bash
-bash scripts/run_remote_experiment.sh <experiment-slug> <train-script>
-```
-
-The wrapper writes:
-
-- `logs/<RUN_ID>.txt`
-- `logs/<RUN_ID>.remote.meta.txt`
-- `logs/<RUN_ID>.summary.txt`
-- `artifacts/<RUN_ID>/final_model.pt` when present
-- `artifacts/<RUN_ID>/final_model.int8.ptz` when present
-
-Important:
-
-- the wrapper must tee `torchrun` output into `logs/<RUN_ID>.txt`
-- if the script version you are using does not contain `| tee "$LOG_PATH"` on the `torchrun` line, fix that before trusting the result
-- a remote run without the real `logs/<RUN_ID>.txt` file is not a valid recorded result in this repo
-
-Defaults:
-
-- `DATA_PATH=./data/datasets/fineweb10B_sp1024/`
-- `TOKENIZER_PATH=./data/tokenizers/fineweb_1024_bpe.model`
-- `VOCAB_SIZE=1024`
-- `SEED=1337`
-- `VAL_LOSS_EVERY=0`
-- `MAX_WALLCLOCK_SECONDS=600`
-- `NPROC_PER_NODE=1`
-
-Override them in the shell only when the experiment explicitly needs it.
-
-This script is for stage 3 only. It is not the final leaderboard-faithful `8xH100` runner.
-
-For the common same-pod baseline/control/candidate sequence from the local machine, use:
-
-```bash
-bash scripts/run_remote_validation_sequence.sh \
-  auto \
-  pr824-kgiir-lite \
-  codex/pr824-kgiir-lite \
-  experiments/pr824-kgiir-lite/train_gpt.py
-```
-
-This local helper:
-
-- optionally pushes `main`, the PR824 positive-control branch, and the candidate branch to `origin`
-- claims a stopped validation pod using a local lock under `codex_notes/coordination_live/remote_pod_claims/`
-- starts that pod with `runpodctl`
-- resolves the live SSH endpoint via `runpodctl ssh info`
-- bootstraps the pod repo and dataset if needed
-- runs baseline, control, and candidate in order
-- pulls logs and artifacts back under `remote_results/`
-- stops and releases the pod by default when the sequence exits
-
-For crash recovery or laptop restarts, the same helper now supports resuming mid-sequence:
-
-```bash
-START_STAGE=control \
-SKIP_REMOTE_SETUP=1 \
-BASELINE_RUN_ID=remote_pr824-kgiir-lite_baseline_20260406_153725 \
-bash scripts/run_remote_validation_sequence.sh \
-  root@103.207.149.118 \
-  pr824-kgiir-lite \
-  codex/pr824-kgiir-lite \
-  experiments/pr824-kgiir-lite/train_gpt.py
-```
-
-Use:
-
-- `START_STAGE=control` to skip baseline and continue with control + candidate
-- `START_STAGE=candidate` to skip directly to the candidate
-- `BASELINE_RUN_ID=...` and `CONTROL_RUN_ID=...` to pull previously completed stage outputs into the local result directory
-- `SKIP_REMOTE_SETUP=1` only when the pod repo and dataset are already known-good
-
-Important:
-
-- `logs/` and `artifacts/` are disposable run outputs and are intentionally ignored by git
-- a remote repo that only contains ignored outputs is still considered clean enough for the next stage
-- the stage runner also deletes disposable `artifacts/` and leftover `final_model*` files before each new stage switch, so old branch snapshots do not block the next branch checkout
-- the stage runner is fetched from `origin/main` for every stage, so older experiment branches do not need to contain the latest remote wrapper scripts themselves
-- if a promoted branch does not contain the expected experiment-local trainer path, the stage runner falls back to the branch root trainer with the same basename, usually `train_gpt.py`
-- before each stage, the helper also removes untracked non-ignored files with `git clean -fd`, so prior branch-only experiment files and temporary wrapper copies do not poison the next stage
-
-## Validation-pod guard rails
-
-The normal stage-3 validation flow is now:
-
-1. claim a validation pod with `scripts/claim_remote_validation_pod.sh`
-2. only claim pods whose RunPod status is `EXITED`
-3. never reuse a pod that is already running but not locally claimed
-4. after the run, stop and release it with `scripts/release_remote_validation_pod.sh`
-
-This means:
-
-- up to `3` validation jobs can run in parallel
-- each should occupy a different pod
-- a running pod is treated as busy, even if it lacks a local lock, to avoid stepping on work started elsewhere
-
-If you want a manual claim without immediately running a sequence:
-
-```bash
-bash scripts/claim_remote_validation_pod.sh main-agent
-```
-
-That returns JSON including:
-
-- `id`
-- `name`
-- `ssh_command`
-- `ip`
-- `port`
-
-## True remote submission runner
-
-For the final stage, use:
-
-```bash
-bash scripts/run_remote_submission_8xh100.sh <experiment-slug> <train-script>
-```
-
-This runner:
-
-- requires exactly `8` visible GPUs
-- uses `torchrun --nproc_per_node=8`
-- preserves the challenge-style `600` second wallclock cap by default
-- writes the same style of logs, summaries, and artifact directories as the cheaper remote runner
-- is intended to run as the only active submission-stage job
-
-To create the matching RunPod shape, use:
-
-```bash
-bash scripts/create_remote_submission_pod.sh
-```
-
-Optional overrides:
-
-```bash
-POD_NAME=parameter-golf-8xh100-a \
-DATA_CENTER_IDS=AP-IN-1 \
-bash scripts/create_remote_submission_pod.sh
-```
-
-Submission-stage policy:
-
-- create only one `8xH100` pod
-- run only one submission-stage experiment at a time
-- stop that pod when the run and immediate inspection are finished
-
-## Canonical first runs
+## Standard runner examples
 
 Baseline:
 
@@ -312,318 +104,89 @@ Baseline:
 bash scripts/run_remote_experiment.sh baseline train_gpt.py
 ```
 
-PR824 mimic positive control:
+Merged-record control:
 
 ```bash
 bash scripts/run_remote_experiment.sh \
-  pr824-mimic \
-  experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py
+  merged-record-signalrush \
+  records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py
 ```
 
-Current best local candidate:
+Candidate:
 
 ```bash
-bash scripts/run_remote_experiment.sh \
-  pr824-kgiir-lite \
-  experiments/pr824-kgiir-lite/train_gpt.py
-```
-
-Second best local candidate:
-
-```bash
-bash scripts/run_remote_experiment.sh \
-  pr824-qkgain5 \
-  experiments/pr824-qkgain5/train_gpt.py
-```
-
-CUDA-specific branch that local MLX cannot fairly judge:
-
-```bash
-QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 \
 bash scripts/run_remote_experiment.sh \
   compile-safe-late-qat \
   experiments/compile-safe-late-qat/train_gpt.py
 ```
 
-True `8xH100` submission-style run:
+## Queue helper
+
+The local helper can run baseline -> merged-record control -> candidate in one pass:
 
 ```bash
-bash scripts/run_remote_submission_8xh100.sh \
-  pr824-kgiir-lite \
-  experiments/pr824-kgiir-lite/train_gpt.py
+bash scripts/run_remote_validation_sequence.sh \
+  auto \
+  compile-safe-late-qat \
+  codex/compile-safe-late-qat \
+  experiments/compile-safe-late-qat/train_gpt.py
 ```
 
-## End-to-end exact command sequence
+It will:
 
-Example for a fresh pod and the current top candidate:
+- claim a stopped validation pod
+- start it
+- resolve the live SSH endpoint
+- bootstrap repo and data if needed
+- run the three-stage sequence
+- pull back logs and artifacts into `remote_results/`
+- stop and release the pod by default
+
+## Restart-safe resume
+
+If a laptop restart interrupts a sequence, resume from `control` or `candidate`:
 
 ```bash
-cd /workspace
-git clone https://github.com/openai/parameter-golf.git
-cd parameter-golf
-python3 data/cached_challenge_fineweb.py --variant sp1024
-
-bash scripts/run_remote_experiment.sh baseline train_gpt.py
-
-git fetch origin codex/pr824-mimic-gatedattn-valueresid
-git switch -C codex/pr824-mimic-gatedattn-valueresid --track origin/codex/pr824-mimic-gatedattn-valueresid
-bash scripts/run_remote_experiment.sh pr824-mimic experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py
-
-git fetch origin codex/pr824-kgiir-lite
-git switch -C codex/pr824-kgiir-lite --track origin/codex/pr824-kgiir-lite
-bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py
+START_STAGE=control \
+SKIP_REMOTE_SETUP=1 \
+BASELINE_RUN_ID=remote_compile-safe-late-qat_baseline_20260406_153725 \
+bash scripts/run_remote_validation_sequence.sh \
+  root@<ip> \
+  compile-safe-late-qat \
+  codex/compile-safe-late-qat \
+  experiments/compile-safe-late-qat/train_gpt.py
 ```
 
-Example for the next promoted branch on the same pod:
+Use:
 
-```bash
-cd /workspace/parameter-golf
-git fetch origin codex/pr824-qkgain5
-git switch -C codex/pr824-qkgain5 --track origin/codex/pr824-qkgain5
-bash scripts/run_remote_experiment.sh pr824-qkgain5 experiments/pr824-qkgain5/train_gpt.py
-```
+- `START_STAGE=control` to skip baseline
+- `START_STAGE=candidate` to skip baseline and control
+- `BASELINE_RUN_ID=...` and `CONTROL_RUN_ID=...` to pull already-finished outputs into the local result directory
 
-To inspect the result quickly:
+## Validation-pod guard rails
 
-```bash
-tail -n 40 logs/remote_pr824-kgiir-lite_*.summary.txt
-tail -n 80 logs/remote_pr824-kgiir-lite_*.txt
-ls -lh artifacts/remote_pr824-kgiir-lite_*/
-```
+The normal stage-3 flow is:
 
-## How to judge the result
+1. claim a pod
+2. only claim pods whose RunPod status is `EXITED`
+3. treat already-running pods as busy
+4. release and stop them after the batch
 
-First compare against the same-pod baseline.
+This is safe for multiple local agents on this machine and conservative against pods started elsewhere.
 
-Then compare against the same-pod PR824 mimic positive control if the candidate is in the current exploit family.
+## Artifact pullback
 
-Record at minimum:
-
-- exact branch and commit
-- exact command
-- `final_int8_zlib_roundtrip_exact val_bpb`
-- `serialized_model_int8_zlib`
-- training `step_avg` if present
-- whether the result beat the same-pod baseline
-- whether it beat the same-pod positive control
-
-## Promotion thresholds after the first remote run
-
-Treat the branch as worth more remote spend when at least one is true:
-
-- it clearly beats the same-pod baseline
-- it beats the current same-pod positive control
-- it is CUDA-specific and behaves credibly enough to justify one more confirm run
-
-Escalate from stage 3 to stage 4 only when:
-
-- the branch beats the same-pod baseline remotely
-- it is at least competitive with the current same-pod positive control
-- it is worth the cost of a true `8xH100` run
-
-Treat the branch as not worth more remote spend when any of these are true:
-
-- it loses to the same-pod baseline
-- it exceeds the `16,000,000` byte cap without a compelling compensating gain
-- the run only wins locally but loses remotely without a clear explanation
-
-## Multi-seed follow-up
-
-Only do multiple seeds after a successful first remote run.
-
-Suggested follow-up seeds:
-
-- `1337`
-- `42`
-- `2025`
-
-Run the same trainer path and same pod type. Do not change multiple knobs between seeds.
-
-Exact example:
-
-```bash
-cd /workspace/parameter-golf
-git switch codex/pr824-kgiir-lite
-SEED=42 RUN_ID=remote_pr824-kgiir-lite_seed42 bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py
-SEED=2025 RUN_ID=remote_pr824-kgiir-lite_seed2025 bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py
-```
-
-## Pod lifecycle and cost control
-
-Do not leave a GPU pod running just because the repo is already cloned.
-
-For the RunPod configuration shown in the setup screenshots:
-
-- stopping the pod stops GPU billing
-- `/workspace` on the volume disk persists across stop/start
-- container-disk temporary storage is erased when the pod is stopped
-- terminating or deleting the pod deletes the volume disk tied to that pod
-
-Practical rule:
-
-- stop the pod when you are not actively running or inspecting a job
-- keep the pod only if you expect to resume soon and want to preserve `/workspace`
-- terminate the pod only after copying out any logs or artifacts you still need
-
-From the local machine with `runpodctl`:
-
-```bash
-runpodctl pod list
-runpodctl pod stop <pod_id>
-runpodctl pod start <pod_id>
-runpodctl pod get <pod_id>
-```
-
-Use the recorded pod ids in:
-
-- `codex_notes/coordination_live/remote_pod_inventory.md`
-
-That means yes, you can spin pods up and down on demand. For cost control, that should be the default.
-
-For the true submission stage, do not create or start an `8xH100` pod casually. That stage is materially more expensive than the 1xH100 validation fleet.
-
-## Parallelism
-
-Yes, remote experiments can run in parallel, but only if the hardware layout supports it cleanly.
-
-### Safe parallel option A: multiple pods
-
-This is the cleanest setup.
-
-- one pod per experiment
-- one branch checked out per pod
-- one active training run per pod
-
-This keeps metrics comparable and avoids GPU contention.
-
-In this repo, that means up to `3` concurrent validation runs because there are currently three `1xH100` validation pods.
-
-### Safe parallel option B: one multi-GPU pod, one run per GPU
-
-This is only appropriate if the pod has more than one GPU.
-
-Requirements:
-
-- separate branch or worktree per experiment inside the pod
-- one process pinned per GPU with `CUDA_VISIBLE_DEVICES`
-- distinct `RUN_ID`s
-- distinct shell sessions
-
-Example on a 2-GPU pod:
-
-```bash
-cd /workspace
-git clone https://github.com/openai/parameter-golf.git parameter-golf-pr824-kgiir-lite
-git clone https://github.com/openai/parameter-golf.git parameter-golf-pr824-qkgain5
-```
-
-In shell 1:
-
-```bash
-cd /workspace/parameter-golf-pr824-kgiir-lite
-git fetch origin codex/pr824-kgiir-lite
-git switch -C codex/pr824-kgiir-lite --track origin/codex/pr824-kgiir-lite
-CUDA_VISIBLE_DEVICES=0 NPROC_PER_NODE=1 bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py
-```
-
-In shell 2:
-
-```bash
-cd /workspace/parameter-golf-pr824-qkgain5
-git fetch origin codex/pr824-qkgain5
-git switch -C codex/pr824-qkgain5 --track origin/codex/pr824-qkgain5
-CUDA_VISIBLE_DEVICES=1 NPROC_PER_NODE=1 bash scripts/run_remote_experiment.sh pr824-qkgain5 experiments/pr824-qkgain5/train_gpt.py
-```
-
-### What not to do on the current 1xH100 pod
-
-Do not run two real training jobs at once on the same single-GPU pod if you care about:
-
-- fair speed comparisons
-- stable memory behavior
-- reproducible training curves
-
-On a 1xH100 pod, the correct default is sequential GPU runs, not parallel GPU runs.
-
-### What not to do for the 8xH100 submission stage
-
-Do not:
-
-- run two submission-stage experiments at once
-- create multiple competing `8xH100` pods for the same comparison wave
-- treat the submission stage as a high-throughput parallel search tier
-
-The `8xH100` stage is intentionally serialized so results stay interpretable and cost stays bounded.
-
-## SSH, logs, and model retrieval
-
-To get current pod connection details after a start:
-
-```bash
-runpodctl pod get <pod_id>
-```
-
-For SSH, use the RunPod UI or the `pod get` output to find the current connection endpoint after the pod is running.
-
-Inside the pod, all standardized remote runs now leave behind:
-
-- log:
-  - `logs/<RUN_ID>.txt`
-- metadata:
-  - `logs/<RUN_ID>.remote.meta.txt`
-- summary:
-  - `logs/<RUN_ID>.summary.txt`
-- model artifacts:
-  - `artifacts/<RUN_ID>/final_model.pt`
-  - `artifacts/<RUN_ID>/final_model.int8.ptz`
-
-Useful in-pod commands:
-
-```bash
-cd /workspace/parameter-golf
-ls logs
-ls artifacts
-tail -n 80 logs/<RUN_ID>.txt
-cat logs/<RUN_ID>.summary.txt
-ls -lh artifacts/<RUN_ID>
-```
-
-If you need to preserve results before deleting a pod, copy out at least:
+After each remote run, pull back at least:
 
 - `logs/<RUN_ID>.txt`
+- `logs/<RUN_ID>.remote.meta.txt`
 - `logs/<RUN_ID>.summary.txt`
 - `artifacts/<RUN_ID>/final_model.int8.ptz`
 
-If direct TCP SSH is enabled for the pod, you can use `scp` from the local machine once the pod is running. The exact host and port come from the RunPod connection panel for that pod.
+For serious runs, also pull back:
 
-Generic pattern:
+- `artifacts/<RUN_ID>/final_model.pt`
 
-```bash
-scp -P <port> -i ~/.ssh/id_ed25519_personal \
-  root@<host>:/workspace/parameter-golf/logs/<RUN_ID>.summary.txt \
-  /tmp/<RUN_ID>.summary.txt
+## Practical rule
 
-scp -P <port> -i ~/.ssh/id_ed25519_personal \
-  root@<host>:/workspace/parameter-golf/artifacts/<RUN_ID>/final_model.int8.ptz \
-  /tmp/<RUN_ID>.int8.ptz
-```
-
-## How to update repo memory after a remote run
-
-Immediately update:
-
-1. the experiment scratchpad
-2. `codex_notes/coordination_live/experiment_board.md`
-3. `codex_notes/coordination_live/remote_run_queue.md`
-
-Copy only the high-signal facts:
-
-- machine / provider
-- run id
-- log path
-- artifact path
-- pre-quant and post-quant metrics
-- artifact size
-- whether to continue or stop
-
-Do not paste giant raw logs into notes.
+Keep one validation pod warm for an active batch. Do not create a fresh pod per candidate unless capacity forces it.

@@ -12,7 +12,7 @@ Usage:
 
 Examples:
   bash scripts/run_remote_experiment.sh baseline train_gpt.py
-  bash scripts/run_remote_experiment.sh pr824-mimic experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py
+  bash scripts/run_remote_experiment.sh merged-record-signalrush records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py
 EOF
   exit 2
 fi

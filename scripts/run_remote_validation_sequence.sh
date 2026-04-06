@@ -10,15 +10,15 @@ Usage:
 Examples:
   bash scripts/run_remote_validation_sequence.sh \
     auto \
-    pr824-kgiir-lite \
-    codex/pr824-kgiir-lite \
-    experiments/pr824-kgiir-lite/train_gpt.py
+    compile-safe-late-qat \
+    codex/compile-safe-late-qat \
+    experiments/compile-safe-late-qat/train_gpt.py
 
   bash scripts/run_remote_validation_sequence.sh \
     runpod-pg-a \
-    pr824-kgiir-lite \
-    codex/pr824-kgiir-lite \
-    experiments/pr824-kgiir-lite/train_gpt.py
+    compile-safe-late-qat \
+    codex/compile-safe-late-qat \
+    experiments/compile-safe-late-qat/train_gpt.py
 EOF
   exit 2
 fi
@@ -49,9 +49,9 @@ SKIP_REMOTE_SETUP="${SKIP_REMOTE_SETUP:-0}"
 AUTO_CLAIMED_POD_ID=""
 AUTO_SSH_INFO_JSON=""
 
-CONTROL_SLUG="${CONTROL_SLUG:-pr824-mimic}"
-CONTROL_BRANCH="${CONTROL_BRANCH:-codex/pr824-mimic-gatedattn-valueresid}"
-CONTROL_SCRIPT="${CONTROL_SCRIPT:-experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py}"
+CONTROL_SLUG="${CONTROL_SLUG:-merged-record-signalrush}"
+CONTROL_BRANCH="${CONTROL_BRANCH:-main}"
+CONTROL_SCRIPT="${CONTROL_SCRIPT:-records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py}"
 BASELINE_SLUG="${BASELINE_SLUG:-baseline}"
 BASELINE_BRANCH="${BASELINE_BRANCH:-main}"
 BASELINE_SCRIPT="${BASELINE_SCRIPT:-train_gpt.py}"

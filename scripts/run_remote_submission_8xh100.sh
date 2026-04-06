@@ -9,7 +9,7 @@ Usage:
 
 Examples:
   bash scripts/run_remote_submission_8xh100.sh baseline train_gpt.py
-  bash scripts/run_remote_submission_8xh100.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py
+  bash scripts/run_remote_submission_8xh100.sh merged-record-signalrush records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py
 EOF
   exit 2
 fi

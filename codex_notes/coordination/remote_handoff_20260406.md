@@ -26,7 +26,7 @@ Date: `2026-04-06`
   - `scripts/run_remote_submission_8xh100.sh`
 - Added a local pullback helper for finished remote runs:
   - `scripts/pull_remote_run_artifacts.sh`
-- Added a local stage-3 queue runner that executes baseline, PR824 mimic, and one candidate over SSH:
+- Added a local stage-3 queue runner that executes baseline, a merged-record control, and one candidate over SSH:
   - `scripts/run_remote_validation_sequence.sh`
 - Added local validation-pod claim/release helpers:
   - `scripts/claim_remote_validation_pod.sh`
