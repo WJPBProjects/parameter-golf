@@ -13,7 +13,7 @@ CLAIM_POLL_SECONDS="${CLAIM_POLL_SECONDS:-5}"
 mkdir -p "$CLAIMS_DIR"
 
 if resolved_key="$(bash "$ROOT/scripts/resolve_runpod_ssh_key.sh" 2>/dev/null)"; then
-  SSH_READY_OPTS=(-i "$resolved_key" -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+  SSH_READY_OPTS=(-i "$resolved_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
 else
   SSH_READY_OPTS=(-o StrictHostKeyChecking=accept-new -o BatchMode=yes)
 fi
