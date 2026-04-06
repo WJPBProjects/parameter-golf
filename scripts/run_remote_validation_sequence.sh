@@ -187,15 +187,24 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-RUNNER_SCRIPT="/tmp/run_remote_experiment_from_main.sh"
+mkdir -p "$REMOTE_REPO_DIR/.codex_tmp"
+RUNNER_SCRIPT="$REMOTE_REPO_DIR/.codex_tmp/run_remote_experiment_from_main.sh"
 git show origin/main:scripts/run_remote_experiment.sh >"$RUNNER_SCRIPT"
 chmod +x "$RUNNER_SCRIPT"
+
+TRAIN_SCRIPT_TO_USE="$TRAIN_SCRIPT"
+if [[ ! -f "$TRAIN_SCRIPT_TO_USE" ]]; then
+  TRAIN_SCRIPT_FALLBACK="$(basename "$TRAIN_SCRIPT_TO_USE")"
+  if [[ -f "$TRAIN_SCRIPT_FALLBACK" ]]; then
+    TRAIN_SCRIPT_TO_USE="$TRAIN_SCRIPT_FALLBACK"
+  fi
+fi
 
 if [[ -n "$EXTRA_ENV" ]]; then
   eval "export $EXTRA_ENV"
 fi
 export RUN_ID="$RUN_ID_VALUE"
-bash "$RUNNER_SCRIPT" "$STAGE_SLUG" "$TRAIN_SCRIPT"
+bash "$RUNNER_SCRIPT" "$STAGE_SLUG" "$TRAIN_SCRIPT_TO_USE"
 EOF
 
   if [[ "$PULL_AFTER_EACH" == "1" ]]; then

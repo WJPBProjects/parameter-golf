@@ -236,6 +236,7 @@ Important:
 - a remote repo that only contains ignored outputs is still considered clean enough for the next stage
 - the stage runner also deletes disposable `artifacts/` and leftover `final_model*` files before each new stage switch, so old branch snapshots do not block the next branch checkout
 - the stage runner is fetched from `origin/main` for every stage, so older experiment branches do not need to contain the latest remote wrapper scripts themselves
+- if a promoted branch does not contain the expected experiment-local trainer path, the stage runner falls back to the branch root trainer with the same basename, usually `train_gpt.py`
 
 ## Validation-pod guard rails
 
