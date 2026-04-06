@@ -11,3 +11,4 @@ data/docs_selected.jsonl
 logs/
 .uv-cache
 codex_notes/coordination_live
+codex_notes/coordination/remote_pod_claims/

@@ -146,6 +146,13 @@ Do not paste private keys or API tokens into repo notes or chat.
 
 If `runpodctl ssh info <pod-id>` is working, the local queue helper can now avoid a manual alias entirely by using `auto` mode.
 
+The queue helper also attempts to resolve the matching private key automatically by comparing:
+
+- `runpodctl ssh list-keys`
+- local `~/.ssh/*.pub` fingerprints
+
+in `scripts/resolve_runpod_ssh_key.sh`.
+
 ## Standard runner
 
 Use the wrapper script so remote runs produce a consistent `RUN_ID`, metadata file, and summary file:

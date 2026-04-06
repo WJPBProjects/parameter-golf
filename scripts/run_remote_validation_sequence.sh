@@ -60,6 +60,14 @@ CANDIDATE_ENV="${CANDIDATE_ENV:-}"
 
 mkdir -p "$RESULT_DIR"
 
+if [[ -z "$SSH_OPTS" ]]; then
+  if resolved_key="$(bash "$ROOT/scripts/resolve_runpod_ssh_key.sh" 2>/dev/null)"; then
+    SSH_OPTS="-i $resolved_key -o StrictHostKeyChecking=accept-new -o BatchMode=yes"
+  else
+    SSH_OPTS="-o StrictHostKeyChecking=accept-new -o BatchMode=yes"
+  fi
+fi
+
 ssh_cmd() {
   if [[ -n "$SSH_PORT" ]]; then
     # shellcheck disable=SC2086
