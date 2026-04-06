@@ -59,6 +59,7 @@ EOF
   deadline=$(( $(date +%s) + CLAIM_TIMEOUT_SECONDS ))
   while (( $(date +%s) < deadline )); do
     ssh_info="$(runpodctl ssh info "$pod_id" 2>/dev/null || true)"
+    mkdir -p "$claim_dir"
     if [[ -n "$ssh_info" ]] && printf '%s' "$ssh_info" | jq -e '.ssh_command? and .ip? and .port?' >/dev/null 2>&1; then
       printf '%s\n' "$pod_json" >"$claim_dir/pod.get.json"
       printf '%s\n' "$ssh_info" >"$claim_dir/ssh.info.json"
