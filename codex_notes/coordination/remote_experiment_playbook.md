@@ -127,6 +127,12 @@ The wrapper writes:
 - `artifacts/<RUN_ID>/final_model.pt` when present
 - `artifacts/<RUN_ID>/final_model.int8.ptz` when present
 
+Important:
+
+- the wrapper must tee `torchrun` output into `logs/<RUN_ID>.txt`
+- if the script version you are using does not contain `| tee "$LOG_PATH"` on the `torchrun` line, fix that before trusting the result
+- a remote run without the real `logs/<RUN_ID>.txt` file is not a valid recorded result in this repo
+
 Defaults:
 
 - `DATA_PATH=./data/datasets/fineweb10B_sp1024/`

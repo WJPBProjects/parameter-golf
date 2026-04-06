@@ -21,6 +21,22 @@ Date: `2026-04-06`
   - `AGENTS.md`
   - `codex_notes/coordination_live/promotion_rubric.md`
   - `codex_notes/coordination_live/remote_run_queue.md`
+- Fixed the remote wrappers so they actually tee `torchrun` output into the claimed log path:
+  - `scripts/run_remote_experiment.sh`
+  - `scripts/run_remote_submission_8xh100.sh`
+
+## Minimum expected repo state
+
+Before using the remote wrappers, make sure the checkout includes the log-capture fix.
+
+- Required behavior:
+  - `scripts/run_remote_experiment.sh` writes `logs/<RUN_ID>.txt`
+  - `scripts/run_remote_submission_8xh100.sh` writes `logs/<RUN_ID>.txt`
+- Practical check:
+  - both scripts should contain `| tee "$LOG_PATH"` in the `torchrun` line
+- Reason:
+  - without that, the wrapper cannot satisfy the repo's own remote-result validity rules
+  - the summary file will claim a log path that was never written
 
 ## Current operating model
 
