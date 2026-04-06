@@ -1,11 +1,11 @@
 # Active Run Status
 
-Last updated: 2026-04-06 22:24 UTC
+Last updated: 2026-04-06 21:08 UTC
 
 ## Current execution
 
-- Active wave: `PAUSED_REMOTE_BALANCE`
-- Profile: `8xH100 remote ranking lane with dynamic pod-id SSH`
+- Active wave: `PAUSED_REMOTE_RUNNER_FIX`
+- Profile: `8xH100 remote ranking lane, one-pod queue A`
 - Current pod:
   - `none`
 - Current experiment:
@@ -13,12 +13,27 @@ Last updated: 2026-04-06 22:24 UTC
 
 ## Current blocker
 
-- RunPod balance is below the minimum resume threshold for an `8xH100` on-demand pod.
-- Current observed error from `runpodctl pod start`:
-  - `Insufficient balance to resume this on-demand pod. You need at least $3.59 (current: $3.01, deficit: $0.58).`
-- Consequence:
-  - no new `8xH100` pod can be started until credits are added
-  - repo and queues are being prepared offline in the meantime
+- None after runner fix; all pods are stopped.
+
+## Latest aborted remote run
+
+- Run id:
+  - `submission8x_late-value-embed-qk5_20260406_220224`
+- Pod:
+  - `h91bgyz08fp9dk`
+- Branch:
+  - `codex/late-value-embed-qk5`
+- Train script:
+  - `experiments/late-value-embed-qk5/train_gpt.py`
+- Extra env:
+  - `VE_ENABLED=1 VE_DIM=128 VE_LAYERS=7,8 QK_GAIN_INIT=5.0 VAL_LOSS_EVERY=1500`
+- Launch mode:
+  - manual retry on the already-running `8xH100` pod
+- Current status:
+  - invalid / aborted before any trusted metric
+  - transient SSH monitor failure left duplicate `torchrun` jobs alive during retries
+  - killed the remote training processes and stopped Pod C
+  - fixed `scripts/run_remote_submission_batch.sh` so monitoring SSH failures do not exit the runner and remote prelaunch cleanup kills stale trainer processes before a new launch
 
 ## Latest remote attempts
 
@@ -73,39 +88,35 @@ Submission-lane calibration:
 
 ## Next actions after this run
 
-1. add enough RunPod credit to resume at least one `8xH100` pod
-2. resume the remote lane with exactly one warm `8xH100` pod:
-   - prefer Pod A
-   - use Pod C only as fallback
-3. run queue A first:
+1. rerun queue A after the runner fix:
    - `late-value-embed-qk5`
    - `embedding-skip-parallel-late`
-4. only if queue A completes cleanly and budget remains, run queue B:
+2. evaluate whether either queue A candidate earns a second run or submission package
+3. only after that consider overflow queue B:
    - `parallelres-qkgain5`
    - `compile-safe-late-qat`
-5. only if budget still remains, run queue C:
+4. only if budget still remains, run queue C:
    - `late-value-embed-legal-ttt`
-6. keep the pod warm only while its current queue is active, and stop immediately after
-7. do not spend paid `8xH100` time on repeated setup debugging; stop and fix locally first
+5. keep the pod warm only while its current run or queue is active, and stop immediately after
+6. do not spend paid `8xH100` time on repeated setup debugging; stop and fix locally first
 
 ## Latest local preflight before resumed spend
 
 - `late-value-embed-qk5`:
   - `py_compile` passed for CUDA and MLX trainer copies
-  - local MLX runner smoke passed
-  - log: `/Users/wulfie/code/parameter-golf-worktrees/late-value-embed-qk5/logs/preflight_late_value_embed_qk5_20260406_215133.txt`
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
 - `embedding-skip-parallel-late`:
   - `py_compile` passed for CUDA and MLX trainer copies
-  - local MLX runner smoke passed
-  - log: `/Users/wulfie/code/parameter-golf-worktrees/embedding-skip-parallel-late/logs/preflight_embedding_skip_parallel_late_20260406_215152.txt`
-- `late-value-embed-legal-ttt`, `parallelres-qkgain5`, and `compile-safe-late-qat`:
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
+- `compile-safe-late-qat`, `parallelres-qkgain5`, and `xsa-all`:
   - `py_compile` passed for CUDA and MLX trainer copies
+  - PyTorch trainer import / tiny CPU `GPT` instantiate / forward pass passed
 - Caveat:
   - some branches do not have MLX implementations for their remote-only features, so a local MLX run would not validate the actual remote hypothesis
 
 ## Billing rule
 
-- no other pods should be left running unless they are actively serving the current batch
+- no other pods should be left running unless they are actively serving the current run or batch
 - all `1xH100` validation pods have been deleted
 - Pod B has been deleted from the `8xH100` fleet after instability
 - all remaining `8xH100` fleet pods are currently stopped

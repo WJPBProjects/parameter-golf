@@ -453,6 +453,15 @@ if [[ ! -f "$resolved_train_script" ]]; then
   find . -maxdepth 3 -path './experiments/*/train_gpt.py' -o -name train_gpt.py | sort >&2 || true
   exit 3
 fi
+pkill -f 'torchrun .*train_gpt.py' >/dev/null 2>&1 || true
+pkill -f 'python -u .*train_gpt.py' >/dev/null 2>&1 || true
+pkill -f 'run_remote_submission_8xh100.sh' >/dev/null 2>&1 || true
+sleep 2
+if pgrep -af 'torchrun .*train_gpt.py|python -u .*train_gpt.py|run_remote_submission_8xh100.sh' >/dev/null 2>&1; then
+  echo "remote_prelaunch_process_cleanup_failed" >&2
+  pgrep -af 'torchrun .*train_gpt.py|python -u .*train_gpt.py|run_remote_submission_8xh100.sh' >&2 || true
+  exit 4
+fi
 export RUN_ID="$RUN_ID_VALUE"
 nohup bash "$REMOTE_REPO_DIR/.codex_tmp/run_remote_submission_8xh100.sh" "$STAGE_SLUG" "$resolved_train_script" >"$REMOTE_REPO_DIR/.codex_tmp/${RUN_ID_VALUE}.launch.txt" 2>&1 &
 echo $! >"$REMOTE_REPO_DIR/.codex_tmp/${RUN_ID_VALUE}.pid"
@@ -463,7 +472,7 @@ EOF
   early_stop_reason=""
   monitor_failure_reason=""
   while (( $(date +%s) < deadline )); do
-    log_tail="$(ssh_cmd "$TARGET" "test -f $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") && tail -n $EARLY_STOP_LOG_TAIL_LINES $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") || true")"
+    log_tail="$(ssh_cmd "$TARGET" "test -f $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") && tail -n $EARLY_STOP_LOG_TAIL_LINES $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") || true" || true)"
     if [[ "$(has_final_metric_line "$log_tail")" == "YES" ]]; then
       final_detected=1
       break
@@ -477,7 +486,11 @@ EOF
         break
       fi
     fi
-    remote_alive="$(ssh_cmd "$TARGET" "pid_file=$(printf '%q' "$REMOTE_REPO_DIR/.codex_tmp/$run_id.pid"); if [[ -f \$pid_file ]] && kill -0 \$(cat \$pid_file) 2>/dev/null; then echo ALIVE; else echo DEAD; fi" || echo DEAD)"
+    remote_alive="$(ssh_cmd "$TARGET" "pid_file=$(printf '%q' "$REMOTE_REPO_DIR/.codex_tmp/$run_id.pid"); if [[ -f \$pid_file ]] && kill -0 \$(cat \$pid_file) 2>/dev/null; then echo ALIVE; else echo DEAD; fi" || echo UNKNOWN)"
+    if [[ "$remote_alive" == "UNKNOWN" ]]; then
+      sleep "$POLL_SECONDS"
+      continue
+    fi
     if [[ "$remote_alive" == "DEAD" ]]; then
       monitor_failure_reason="remote_process_exited_before_final_metric"
       break

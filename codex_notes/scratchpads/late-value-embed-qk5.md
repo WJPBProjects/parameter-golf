@@ -52,6 +52,22 @@
 - Remote priority:
   - queue A
 
+## Remote Training
+
+- Status: TODO
+- Date:
+  - `2026-04-06`
+- Machine / provider:
+  - `RunPod 8xH100`
+- Run identifier:
+  - `submission8x_late-value-embed-qk5_20260406_220224`
+- Log path:
+  - remote: `/workspace/parameter-golf/logs/submission8x_late-value-embed-qk5_20260406_215841.txt`
+- Notes:
+  - aborted before a valid metric
+  - transient SSH monitor failure left duplicate remote `torchrun` jobs alive during retries
+  - Pod C was stopped and the local batch runner was fixed before rerunning
+
 ## Next step
 
 - Run on the first `8xH100` batch ahead of derivative branches.
