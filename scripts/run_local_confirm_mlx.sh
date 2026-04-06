@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Stage 2: stronger local confirmation on MLX. This is intentionally longer than
+# the true remote cap so the laptop can produce a cleaner directional signal.
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 

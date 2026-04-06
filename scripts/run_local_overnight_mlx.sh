@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Optional local deepening stage for promising ideas that still need more local-only
+# signal before spending remote CUDA budget.
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 

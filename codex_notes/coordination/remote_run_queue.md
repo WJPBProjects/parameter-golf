@@ -1,56 +1,102 @@
 # Remote Run Queue
 
-This file captures what is still genuinely left to do after the stronger local rerun wave.
+Use this file with:
 
-Local rerun summary:
+- `codex_notes/coordination_live/experiment_board.md`
+- `codex_notes/coordination_live/remote_pod_inventory.md`
+- `codex_notes/coordination_live/remote_experiment_playbook.md`
 
-- `codex_notes/coordination/local_rerun_wave_20260327.md`
+The queue below reflects the stronger April 2 local confirm wave, not the older March-only shortlist.
 
-## Ready for remote now
+## Run order on a fresh pod
 
-1. `PR824 mimic: XSA6 + GatedAttn + ValueResid`
+1. baseline sanity run
+2. PR824 mimic positive control
+3. highest-priority promoted candidate
+4. second promoted candidate
+5. CUDA-only exploratory branch if there is still time
 
+## Canonical baseline and control
+
+### 1. Baseline sanity run
+
+- Status: `TODO`
+- Why:
+  - every promoted experiment should be judged against a same-pod baseline
+- Command:
+  - `bash scripts/run_remote_experiment.sh baseline train_gpt.py`
+
+### 2. PR824 mimic positive control
+
+- Status: `TODO`
+- Branch:
+  - `codex/pr824-mimic-gatedattn-valueresid`
 - Worktree:
   - `/Users/wulfie/code/parameter-golf-worktrees/pr824-mimic-gatedattn-valueresid`
 - Why:
-  - clear best local result in the stronger rerun wave
-  - post-quant `val_bpb` improved from `2.15725007` to `2.10420259`
-- Local log:
-  - `logs/pr824_mimic_long_seed1337.txt`
-- Suggested first remote command:
-  - `RUN_ID=pr824_mimic_remote ./.venv/bin/python experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py`
+  - this is the current trusted exploit-family positive control
+  - fresh local confirm: `1.66770976` on `pr824_stacks_20260402`
+- Command:
+  - `bash scripts/run_remote_experiment.sh pr824-mimic experiments/pr824-mimic-gatedattn-valueresid/train_gpt.py`
 
-## Remote only / not locally adjudicated
+## Highest-priority promoted candidates
 
-2. `Compile-safe Late-QAT`
+### 3. PR824 + KGIIR-lite
 
+- Status: `TODO`
+- Branch:
+  - `codex/pr824-kgiir-lite`
+- Worktree:
+  - `/Users/wulfie/code/parameter-golf-worktrees/pr824-kgiir-lite`
+- Why:
+  - current best local result
+  - fresh local confirm: `1.65947391`
+  - beats local baseline, PR824 mimic, and `pr824-qkgain5`
+- Command:
+  - `bash scripts/run_remote_experiment.sh pr824-kgiir-lite experiments/pr824-kgiir-lite/train_gpt.py`
+
+### 4. PR824 + QK_GAIN=5.0
+
+- Status: `TODO`
+- Branch:
+  - `codex/pr824-qkgain5`
+- Worktree:
+  - `/Users/wulfie/code/parameter-golf-worktrees/pr824-qkgain5`
+- Why:
+  - strong local exploit win
+  - fresh local confirm: `1.66190993`
+  - currently the best simpler stack behind `pr824-kgiir-lite`
+- Command:
+  - `bash scripts/run_remote_experiment.sh pr824-qkgain5 experiments/pr824-qkgain5/train_gpt.py`
+
+## Remote-only / CUDA-specific follow-up
+
+### 5. Compile-safe Late-QAT
+
+- Status: `TODO`
+- Branch:
+  - `codex/compile-safe-late-qat`
 - Worktree:
   - `/Users/wulfie/code/parameter-golf-worktrees/compile-safe-late-qat`
 - Why:
-  - this is a CUDA / `torch.compile` hypothesis, so the Mac cannot really judge it
-- Suggested first remote command:
-  - `QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 RUN_ID=compile-safe-late-qat ./.venv/bin/python experiments/compile-safe-late-qat/train_gpt.py`
+  - local MLX is not a fair test for this CUDA / compile path
+- Command:
+  - `QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 bash scripts/run_remote_experiment.sh compile-safe-late-qat experiments/compile-safe-late-qat/train_gpt.py`
 
-## Optional remote candidate only if we want extra coverage
+## Lower-priority remote coverage only if we want more data
 
-3. `XSA all layers`
+- `PR824 + AttnRes-lite`
+  - real local win and faster than PR824 mimic, but behind the stronger promoted pair
+- `XSA all layers`
+  - still only a modest local positive
 
-- Worktree:
-  - `/Users/wulfie/code/parameter-golf-worktrees/xsa-all`
-- Why:
-  - still slightly positive locally, but the margin is tiny
-  - worth a remote slot only if we want to sanity-check a low-confidence positive
-- Local log:
-  - `logs/xsa_all_long_seed1337_v2.txt`
-- Suggested first remote command:
-  - `XSA_LAST_N=9 RUN_ID=xsa_all_remote ./.venv/bin/python experiments/xsa-all/train_gpt.py`
+## Do not spend remote time on these right now
 
-## Do not promote right now
-
-- `LeakyReLU slope sweep`
-- `Selective post-GPTQ pruning` at `POST_GPTQ_PRUNE_FRACTION=0.02`
+- `Selective post-GPTQ pruning`
 - `GPTQ self calibration`
-- `RoPE + LN-scale` first screened point
-- `SplineConv hybrid`
+- `RoPE + LN-scale grid`
+- `LeakyReLU slope sweep`
+- `Hyperconnection-lite`
+- `MoHD last-MLP lite`
 
-These either regressed or were too close to neutral to justify immediate remote spend.
+These are either local regressions, too ambiguous, or clearly weaker than the current promoted queue.

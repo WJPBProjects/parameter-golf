@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+# Stage 1: cheap local screening. This intentionally trades fidelity for speed.
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
@@ -15,6 +17,7 @@ export DEV_VAL_MAX_BATCHES="${DEV_VAL_MAX_BATCHES:-256}"
 export SKIP_FINAL_INT8_EVAL="${SKIP_FINAL_INT8_EVAL:-0}"
 export MLX_EAGER_EVAL="${MLX_EAGER_EVAL:-0}"
 export MLX_MAX_MICROBATCH_TOKENS="${MLX_MAX_MICROBATCH_TOKENS:-16384}"
+export MAX_WALLCLOCK_SECONDS="${MAX_WALLCLOCK_SECONDS:-600}"
 
 SCRIPT_PATH="${TRAIN_MLX_SCRIPT:-train_gpt_mlx.py}"
 

@@ -67,6 +67,16 @@ Current seed file:
 - This repo uses a two-stage experiment flow:
   - local screening first
   - remote promotion only for ideas that clear the local bar
+- Treat existing public PR implementations as controls or inspirations, not as final submission targets.
+- Do not spend the true `8xH100` submission lane on a straight reimplementation of an existing PR.
+- Submission-stage candidates should contain a meaningfully novel contribution from this repo:
+  - a new composition across ideas
+  - a new extension or ablation-backed variant
+  - or a materially new mechanism not already claimed upstream
+- PR-inspired branches are still useful as:
+  - local controls
+  - remote validation controls
+  - comparators for whether a new idea is actually additive
 - On a fresh machine, restore the saved experiment branches/worktrees before trying to rerun old experiments:
   - `bash scripts/restore_experiment_worktrees.sh`
 - For longer local-only work, there are three standard MLX tiers:

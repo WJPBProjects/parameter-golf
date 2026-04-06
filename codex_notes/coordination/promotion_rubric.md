@@ -26,6 +26,19 @@ Remote runs are for:
 - CUDA-specific behavior
 - true competitive comparisons
 
+## Novelty rule
+
+Use public PR-inspired work as controls and reference points, not as final submission targets by default.
+
+- A straight reimplementation of an existing PR can still be useful locally or as a remote positive control.
+- The true `8xH100` submission stage should be reserved for ideas that are plausibly novel enough to submit.
+- Novel enough usually means at least one of:
+  - a new composition across previously separate ideas
+  - a new extension of an existing idea
+  - a materially different variant with evidence that the interaction is additive
+
+Do not spend the single-lane `8xH100` submission budget on a branch whose only claim is “we reproduced someone else's PR” unless the user explicitly asks for that.
+
 ## Promote to remote when
 
 Promote if at least one of these is true:
@@ -35,6 +48,12 @@ Promote if at least one of these is true:
 - local full run is roughly tied on quality and clearly faster
 - the idea is CUDA- or systems-specific and local MLX is not a fair test
 - the idea is scientifically unusual but shows credible signs of life worth validating
+
+For stage 4 true submission promotion, also require:
+
+- a credible novelty story
+- not merely a direct copy of an existing public PR
+- enough stage 3 remote evidence to justify using the single submission lane
 
 ## Hold or reject when
 
