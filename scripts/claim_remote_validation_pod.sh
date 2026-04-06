@@ -12,6 +12,18 @@ CLAIM_POLL_SECONDS="${CLAIM_POLL_SECONDS:-5}"
 
 mkdir -p "$CLAIMS_DIR"
 
+if resolved_key="$(bash "$ROOT/scripts/resolve_runpod_ssh_key.sh" 2>/dev/null)"; then
+  SSH_READY_OPTS=(-i "$resolved_key" -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+else
+  SSH_READY_OPTS=(-o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+fi
+
+ssh_ready() {
+  local ip="$1"
+  local port="$2"
+  ssh "${SSH_READY_OPTS[@]}" -p "$port" "root@$ip" 'exit 0' >/dev/null 2>&1
+}
+
 POD_IDS=(
   "untjvs1cx2gq4u"
   "2ollt57dzbud46"
@@ -61,10 +73,14 @@ EOF
   while (( $(date +%s) < deadline )); do
     ssh_info="$(runpodctl ssh info "$pod_id" 2>/dev/null || true)"
     if [[ -n "$ssh_info" ]] && printf '%s' "$ssh_info" | jq -e '.ssh_command? and .ip? and .port?' >/dev/null 2>&1; then
-      printf '%s\n' "$pod_json" >"$claim_dir/pod.get.json"
-      printf '%s\n' "$ssh_info" >"$claim_dir/ssh.info.json"
-      printf '%s\n' "$ssh_info"
-      exit 0
+      ip="$(printf '%s' "$ssh_info" | jq -r '.ip')"
+      port="$(printf '%s' "$ssh_info" | jq -r '.port')"
+      if ssh_ready "$ip" "$port"; then
+        printf '%s\n' "$pod_json" >"$claim_dir/pod.get.json"
+        printf '%s\n' "$ssh_info" >"$claim_dir/ssh.info.json"
+        printf '%s\n' "$ssh_info"
+        exit 0
+      fi
     fi
     printf '%s\n' "$ssh_info" >"$claim_dir/ssh.info.last.json"
     sleep "$CLAIM_POLL_SECONDS"
