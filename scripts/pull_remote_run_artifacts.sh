@@ -68,7 +68,9 @@ copy_optional() {
   local remote_path="${REMOTE_REPO_DIR}/${remote_rel}"
   if ssh_cmd "$SSH_TARGET" "test -f $(printf '%q' "$remote_path")"; then
     echo "Pulling optional file: ${remote_rel}"
-    scp_cmd "${SSH_TARGET}:${remote_path}" "$local_path"
+    if ! scp_cmd "${SSH_TARGET}:${remote_path}" "$local_path"; then
+      echo "Optional file copy failed: ${remote_rel}" >&2
+    fi
   else
     echo "Optional file missing: ${remote_rel}"
   fi

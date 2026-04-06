@@ -1,4 +1,6 @@
 # Pod A queue
 # Format:
 # slug<TAB>branch<TAB>train_script<TAB>extra_env(optional)
-# If no shared submission_reference_curve.tsv exists yet, put a control or trusted baseline first.
+# Shared submission_reference_curve.tsv now exists from `submission8x_baseline-8xh100_20260406_201723`.
+compile-safe-late-qat	codex/compile-safe-late-qat	experiments/compile-safe-late-qat/train_gpt.py	QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 VAL_LOSS_EVERY=1500
+late-value-embed-qk5	codex/late-value-embed-qk5	experiments/late-value-embed-qk5/train_gpt.py	VE_ENABLED=1 VE_DIM=128 VE_LAYERS=7,8 QK_GAIN_INIT=5.0 VAL_LOSS_EVERY=1500

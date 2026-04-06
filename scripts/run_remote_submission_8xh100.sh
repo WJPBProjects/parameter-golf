@@ -105,7 +105,7 @@ fi
   echo "finished_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "log_path=$LOG_PATH"
   if [[ -f "$LOG_PATH" ]]; then
-    grep -E "world_size:|final_int(6|8)_roundtrip|Serialized model int(6|8)\+zlib|Total submission size int(6|8)\+zlib|step_avg:|stopping_early:" "$LOG_PATH" | tail -n 20 || true
+    grep -E "^(world_size:|final_int(6|8)_roundtrip(_exact)? |Serialized model int(6|8)\+zlib:|Total submission size int(6|8)\+zlib:|step:[0-9]+/[0-9]+ .*step_avg:|stopping_early:)" "$LOG_PATH" | tail -n 20 || true
   else
     echo "log_missing=1"
   fi

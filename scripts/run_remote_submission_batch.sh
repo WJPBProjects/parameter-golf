@@ -153,6 +153,19 @@ with out_path.open("w") as f:
 PY
 }
 
+has_final_metric_line() {
+  local log_text="$1"
+  LOG_TEXT_INPUT="$log_text" python3 - <<'PY'
+import os
+import re
+import sys
+
+text = os.environ["LOG_TEXT_INPUT"]
+pat = re.compile(r"(?m)^final_int(?:6_roundtrip_exact|8_zlib_roundtrip_exact)\s+val_loss:[0-9.]+\s+val_bpb:[0-9.]+$")
+print("YES" if pat.search(text) else "NO")
+PY
+}
+
 should_early_stop() {
   local log_tail="$1"
   local reference_curve_file="$2"
@@ -310,7 +323,7 @@ if [[ -f final_model.int6.ptz ]]; then mv -f final_model.int6.ptz "artifacts/$RU
   echo "command_exit_code=$RESULT_REASON"
   echo "finished_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "log_path=logs/$RUN_ID_VALUE.txt"
-  grep -E "world_size:|final_int(6|8)_roundtrip|Serialized model int(6|8)\+zlib|Total submission size int(6|8)\+zlib|step_avg:|stopping_early:" "logs/$RUN_ID_VALUE.txt" | tail -n 24 || true
+  grep -E "^(world_size:|final_int(6|8)_roundtrip(_exact)? |Serialized model int(6|8)\+zlib:|Total submission size int(6|8)\+zlib:|step:[0-9]+/[0-9]+ .*step_avg:|stopping_early:)" "logs/$RUN_ID_VALUE.txt" | tail -n 24 || true
   [[ -f "artifacts/$RUN_ID_VALUE/final_model.pt" ]] && echo "artifact_model_pt=artifacts/$RUN_ID_VALUE/final_model.pt"
   [[ -f "artifacts/$RUN_ID_VALUE/final_model.int8.ptz" ]] && echo "artifact_model_ptz=artifacts/$RUN_ID_VALUE/final_model.int8.ptz"
   [[ -f "artifacts/$RUN_ID_VALUE/final_model.int6.ptz" ]] && echo "artifact_model_ptz=artifacts/$RUN_ID_VALUE/final_model.int6.ptz"
@@ -375,7 +388,7 @@ EOF
   early_stop_reason=""
   while (( $(date +%s) < deadline )); do
     log_tail="$(ssh_cmd "$TARGET" "test -f $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") && tail -n $EARLY_STOP_LOG_TAIL_LINES $(printf '%q' "$REMOTE_REPO_DIR/logs/$run_id.txt") || true")"
-    if [[ "$log_tail" == *"final_int6_roundtrip_exact"* || "$log_tail" == *"final_int8_zlib_roundtrip_exact"* ]]; then
+    if [[ "$(has_final_metric_line "$log_tail")" == "YES" ]]; then
       final_detected=1
       break
     fi
