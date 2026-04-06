@@ -33,7 +33,7 @@ The queue below reflects the current merged-record calibration policy.
 
 ### 2. Exact merged-record control
 
-- Status: `IN_PROGRESS`
+- Status: `DONE`
 - Branch:
   - `main`
 - Why:
@@ -44,32 +44,40 @@ The queue below reflects the current merged-record calibration policy.
     - `1.1228`
 - Command:
   - `bash scripts/run_remote_experiment.sh merged-record-signalrush records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py`
+- Latest result:
+  - `remote_merged_record_signalrush_20260406_171426`
+  - final quantized `val_bpb: 2.32295979`
+  - same-pod baseline was `1.32581447`
+  - result directory:
+    - `/Users/wulfie/code/parameter-golf/remote_results/20260406_171426_merged_record_signalrush`
+  - interpretation:
+    - this exact merged record did not transfer directionally to the current stage-3 `1xH100` harness
 
 ## Highest-priority promoted candidates
 
 ### 3. Compile-safe Late-QAT
 
-- Status: `TODO`
+- Status: `HOLD`
 - Branch:
   - `codex/compile-safe-late-qat`
 - Worktree:
   - `/Users/wulfie/code/parameter-golf-worktrees/compile-safe-late-qat`
 - Why:
   - local MLX is not a fair test for this CUDA / compile path
-  - this is a cleaner remote-only candidate than the stale local-only value-path family
+  - but remote candidate ranking is on hold until the merged-record calibration mismatch is understood
 - Command:
   - `QAT_ENABLED=1 LATE_QAT_THRESHOLD=0.15 bash scripts/run_remote_experiment.sh compile-safe-late-qat experiments/compile-safe-late-qat/train_gpt.py`
 
 ### 4. XSA all layers
 
-- Status: `TODO`
+- Status: `HOLD`
 - Branch:
   - `codex/xsa-all`
 - Worktree:
   - `/Users/wulfie/code/parameter-golf-worktrees/xsa-all`
 - Why:
   - modest but repeatable local improvement
-  - simple, low-risk architecture delta worth checking on CUDA
+  - but remote candidate ranking is on hold until the merged-record calibration mismatch is understood
 - Command:
   - `bash scripts/run_remote_experiment.sh xsa-all experiments/xsa-all/train_gpt.py`
 
@@ -77,9 +85,10 @@ The queue below reflects the current merged-record calibration policy.
 
 ### 5. Latest merged-record calibration reruns
 
-- Status: `TODO`
+- Status: `HOLD`
 - Why:
-  - if the first merged-record calibration lands in the right ballpark, rerun it on one more fresh pod to confirm the remote harness is stable
+  - the first merged-record calibration did not land in the right ballpark
+  - do not rerun blindly until the mismatch is debugged
 - Command:
   - `bash scripts/run_remote_experiment.sh merged-record-signalrush records/track_10min_16mb/2026-03-22_11L_EMA_GPTQ-lite_warmdown3500_QAT015_1.1233/train_gpt.py`
 
